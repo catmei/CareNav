@@ -1,6 +1,7 @@
 """FastAPI backend for Emergency Hospital Finder."""
 
 import os
+import json
 import asyncio
 import httpx
 from pathlib import Path
@@ -37,6 +38,12 @@ async def get_enriched_hospitals(
       insurance_accepted, patient_rating.
     Requires the FIRECRAWL_API_KEY environment variable.
     """
+    cache_path = Path(__file__).resolve().parent / "cached_hospitals.json"
+
+    # If cache exists, skip Overpass + Firecrawl entirely
+    if cache_path.exists():
+        return json.loads(cache_path.read_text(encoding="utf-8"))
+
     elements = fetch_overpass_hospitals(lat, lng)
     hospitals = [h for el in elements if (h := normalize_hospital(el, lat, lng))]
     hospitals.sort(key=lambda x: x["distance_miles"])
@@ -51,7 +58,12 @@ async def get_enriched_hospitals(
         for hospital, web_details in zip(top5, web_details_per_hospital)
     ]
 
-    return {"hospitals": enriched}
+    result = {"hospitals": enriched}
+
+    # Save for future runs
+    cache_path.write_text(json.dumps(result, indent=2, ensure_ascii=False), encoding="utf-8")
+
+    return result
 
 
 @app.get("/api/signed-url")

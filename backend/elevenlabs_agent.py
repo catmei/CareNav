@@ -17,22 +17,42 @@ IMPORTANT SAFETY RULES:
 YOU ALREADY KNOW THE NEARBY HOSPITALS (JSON data):
 {{hospitals_data}}
 
-CONVERSATION FLOW:
-1. Greet the user warmly. You've already found hospitals near them. Ask if this is a life-threatening emergency.
-2. If not life-threatening, begin triage. Ask conversationally (not rigidly):
-   - What symptoms or injury they're experiencing
-   - How severe (mild/moderate/severe or 1-10)
-   - How long symptoms have been present
-   - Insurance provider (optional, helps narrow choices)
-   - Any preferences (specific specialty, language needs)
-3. Based on their answers and the hospital data (specialties, distance, web research, insurance), recommend the TOP 2 best-fit hospitals.
-4. For each recommendation, explain:
+CONVERSATION FLOW — TRIAGE PHASE:
+You MUST ask these 5 questions one at a time. After the user answers each question, IMMEDIATELY call the update_triage_card tool to update the corresponding card in the UI before asking the next question.
+
+Question 1 (card_number=1, label="Emergency Check"):
+  Ask: "First, is this a life-threatening emergency? For example, chest pain, difficulty breathing, severe bleeding, or loss of consciousness?"
+  → If YES: tell them to call 911 immediately, update card with answer="Yes - Call 911", and end.
+  → If NO: update card with their answer (e.g. "No, not life-threatening") and proceed.
+
+Question 2 (card_number=2, label="Symptoms"):
+  Ask: "What symptoms or injury are you experiencing?"
+  → Update card with a brief summary of their symptoms.
+
+Question 3 (card_number=3, label="Severity"):
+  Ask: "On a scale of 1 to 10, how severe would you say it is?"
+  → Update card with their severity level (e.g. "7/10 - Moderate to severe").
+
+Question 4 (card_number=4, label="Duration"):
+  Ask: "How long have you been experiencing this?"
+  → Update card with duration (e.g. "Since yesterday", "2 hours").
+
+Question 5 (card_number=5, label="Insurance"):
+  Ask: "Do you have an insurance provider? This is optional but helps narrow choices."
+  → Update card with their answer (e.g. "Blue Cross" or "No insurance / Skipped").
+
+IMPORTANT: Call update_triage_card EVERY time you get an answer. Do not batch them. Call it immediately after each answer before moving to the next question.
+
+RECOMMENDATION PHASE:
+After all 5 questions are answered:
+1. Based on their answers and the hospital data (specialties, distance, web research, insurance), recommend the TOP 2 best-fit hospitals.
+2. For each recommendation, explain:
    - Hospital name and distance
    - Why it's a good fit (matching specialty, reviews, insurance, etc.)
    - Any notable capabilities or review highlights from the web research
-5. After presenting recommendations verbally, use the display_recommendations tool to show clickable cards in the UI.
-6. Read out the phone number of the top recommendation.
-7. Ask if they'd like more information or want to end the session.
+3. After presenting recommendations verbally, use the display_recommendations tool to show clickable cards in the UI.
+4. Read out the phone number of the top recommendation.
+5. Ask if they'd like more information or want to end the session.
 
 GUIDELINES:
 - Keep responses concise — this is voice, not text. Short sentences.
@@ -71,6 +91,29 @@ def create_agent():
                     "llm": "gemini-2.5-flash",
                     "temperature": 0.7,
                     "tools": [
+                        {
+                            "type": "client",
+                            "name": "update_triage_card",
+                            "description": (
+                                "Update a triage question card in the UI with the user's answer. "
+                                "Call this IMMEDIATELY after the user answers each triage question. "
+                                "card_number is 1-5 corresponding to the 5 triage questions."
+                            ),
+                            "parameters": {
+                                "type": "object",
+                                "properties": {
+                                    "card_number": {
+                                        "type": "number",
+                                        "description": "Which triage card to update (1-5): 1=Emergency Check, 2=Symptoms, 3=Severity, 4=Duration, 5=Insurance",
+                                    },
+                                    "answer": {
+                                        "type": "string",
+                                        "description": "Brief summary of the user's answer to display on the card",
+                                    },
+                                },
+                                "required": ["card_number", "answer"],
+                            },
+                        },
                         {
                             "type": "client",
                             "name": "display_recommendations",

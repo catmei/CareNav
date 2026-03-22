@@ -167,6 +167,110 @@ a:hover { text-decoration: underline; }
 .voice-status { font-size: 14px; color: var(--text); font-weight: 500; }
 .voice-hint { font-size: 12px; color: var(--text-dim); }
 
+/* === Triage Cards === */
+.triage-section {
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.triage-header {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+  margin-bottom: 10px;
+}
+.triage-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.triage-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: all 0.3s ease;
+  opacity: 0.5;
+}
+.triage-card.active {
+  opacity: 1;
+  border-color: var(--accent);
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+.triage-card.answered {
+  opacity: 1;
+  border-color: var(--success);
+  background: rgba(34, 197, 94, 0.05);
+}
+.triage-card-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-dim);
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+.triage-card.active .triage-card-icon {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(59, 130, 246, 0.1);
+}
+.triage-card.answered .triage-card-icon {
+  border-color: var(--success);
+  color: var(--success);
+  background: rgba(34, 197, 94, 0.1);
+}
+.triage-card-body {
+  flex: 1;
+  min-width: 0;
+}
+.triage-card-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+.triage-card-answer {
+  font-size: 12px;
+  color: var(--text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.triage-card.answered .triage-card-answer {
+  color: var(--success);
+  font-weight: 500;
+}
+.triage-card-status {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--success);
+}
+
+@keyframes triageCardPop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+.triage-card.answered {
+  animation: triageCardPop 0.3s ease;
+}
+
 /* === Conversation === */
 .conversation {
   flex: 1;

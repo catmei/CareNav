@@ -334,6 +334,12 @@ async function startSession() {
         hospitals_data: JSON.stringify(hospitalsForAgent, null, 2),
       },
       clientTools: {
+        update_triage_card: async (params) => {
+          console.log("[update_triage_card] Called with params:", params);
+          updateTriageCard(params);
+          console.log("[update_triage_card] Card", params.card_number, "updated with:", params.answer);
+          return "Triage card updated successfully.";
+        },
         display_recommendations: async (params) => {
           showRecommendationsFromAgent(params);
           return "Recommendations displayed successfully in the UI.";
@@ -365,6 +371,7 @@ async function startSession() {
     voiceAgent.classList.add("active");
     agentBadge.style.display = "inline-block";
     voiceStatus.textContent = "Session active — listening...";
+    resetTriageCards();
   } catch (err) {
     console.error("Failed to start session:", err);
     voiceStatus.textContent = "Connection failed. Click to retry.";
@@ -447,6 +454,49 @@ function showRecommendationsFromAgent(params) {
     .join("");
 
   recommendationsSection.scrollIntoView({ behavior: "smooth" });
+}
+
+// === Triage Card Updates ===
+function updateTriageCard({ card_number, answer }) {
+  const num = Math.round(card_number);
+  if (num < 1 || num > 5) return;
+
+  const card = document.getElementById(`triageCard${num}`);
+  const answerEl = document.getElementById(`triageAnswer${num}`);
+  const statusEl = document.getElementById(`triageStatus${num}`);
+
+  if (!card || !answerEl || !statusEl) return;
+
+  card.classList.add("answered");
+  answerEl.textContent = answer;
+  statusEl.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+
+  // Highlight the next unanswered card as active
+  for (let i = 1; i <= 5; i++) {
+    const c = document.getElementById(`triageCard${i}`);
+    if (c) c.classList.remove("active");
+  }
+  for (let i = num + 1; i <= 5; i++) {
+    const c = document.getElementById(`triageCard${i}`);
+    if (c && !c.classList.contains("answered")) {
+      c.classList.add("active");
+      break;
+    }
+  }
+}
+
+function resetTriageCards() {
+  for (let i = 1; i <= 5; i++) {
+    const card = document.getElementById(`triageCard${i}`);
+    const answerEl = document.getElementById(`triageAnswer${i}`);
+    const statusEl = document.getElementById(`triageStatus${i}`);
+    if (card) card.classList.remove("answered", "active");
+    if (answerEl) answerEl.textContent = "Waiting...";
+    if (statusEl) statusEl.innerHTML = "";
+  }
+  // Mark first card as active
+  const first = document.getElementById("triageCard1");
+  if (first) first.classList.add("active");
 }
 
 // === Chat helpers ===
