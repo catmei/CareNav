@@ -1,24 +1,23 @@
+import { Conversation } from "https://cdn.jsdelivr.net/npm/@elevenlabs/client@latest/+esm";
+
 // === State ===
 const state = {
   lat: null,
   lng: null,
   hospitals: [],
   sessionActive: false,
-  triageStep: 0,
-  triageData: { symptoms: "", severity: "", duration: "", insurance: "" },
+  conversation: null,
 };
 
 // === DOM refs ===
 const $ = (sel) => document.querySelector(sel);
 const locationStatus = $("#locationStatus");
 const hospitalsList = $("#hospitalsList");
-const conversation = $("#conversation");
+const conversationLog = $("#conversation");
 const voiceAgent = $("#voiceAgent");
 const micButton = $("#micButton");
 const voiceStatus = $("#voiceStatus");
 const agentBadge = $("#agentBadge");
-const textInput = $("#textInput");
-const sendButton = $("#sendButton");
 const addressModal = $("#addressModal");
 const addressSubmit = $("#addressSubmit");
 const retryLocation = $("#retryLocation");
@@ -28,14 +27,6 @@ const recommendationsList = $("#recommendationsList");
 const locationChoiceModal = $("#locationChoiceModal");
 const useGpsBtn = $("#useGpsBtn");
 const enterAddressBtn = $("#enterAddressBtn");
-
-// === Triage conversation flow ===
-const triageQuestions = [
-  { key: "symptoms", question: "Can you describe your symptoms or what happened? For example: chest pain, broken arm, difficulty breathing, allergic reaction." },
-  { key: "severity", question: "On a scale of 1 to 10, how severe would you rate your situation? Or describe it as mild, moderate, or severe." },
-  { key: "duration", question: "How long have you been experiencing these symptoms?" },
-  { key: "insurance", question: "Do you have a preferred insurance provider? This helps me find hospitals that accept your plan. You can skip this if you prefer." },
-];
 
 // === Map ===
 let map = null;
@@ -79,11 +70,9 @@ function plotHospitalsOnMap(hospitals) {
     });
     const marker = L.marker([h.lat, h.lng], { icon }).addTo(map);
     marker.on("click", () => {
-      // Reset all pins to default color
       hospitalMarkers.forEach((m) => {
         m.getElement()?.querySelector(".hospital-map-pin")?.classList.remove("selected-pin");
       });
-      // Highlight clicked pin
       marker.getElement()?.querySelector(".hospital-map-pin")?.classList.add("selected-pin");
       const card = document.getElementById("card-" + h.id);
       if (card) { card.scrollIntoView({ behavior: "smooth" }); card.click(); }
@@ -91,7 +80,6 @@ function plotHospitalsOnMap(hospitals) {
     hospitalMarkers.push(marker);
   });
 
-  // Fit map to show user + all hospitals
   if (hospitals.length > 0) {
     const bounds = L.latLngBounds([
       [state.lat, state.lng],
@@ -103,7 +91,6 @@ function plotHospitalsOnMap(hospitals) {
 
 // === Init ===
 document.addEventListener("DOMContentLoaded", () => {
-  // Show location choice first — don't request GPS without consent
   locationChoiceModal.style.display = "flex";
   setLocationStatus("detecting", "Waiting for location...");
 
@@ -118,8 +105,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   micButton.addEventListener("click", toggleVoiceSession);
-  sendButton.addEventListener("click", handleSend);
-  textInput.addEventListener("keydown", (e) => { if (e.key === "Enter") handleSend(); });
   refreshBtn.addEventListener("click", () => { if (state.lat) fetchHospitals(); });
   addressSubmit.addEventListener("click", handleAddressSubmit);
   retryLocation.addEventListener("click", () => { addressModal.style.display = "none"; detectLocation(); });
@@ -199,6 +184,11 @@ async function fetchHospitals() {
     state.hospitals = data.hospitals;
     renderHospitals(data.hospitals);
     plotHospitalsOnMap(data.hospitals);
+
+    // Enable voice agent now that hospitals are loaded
+    voiceStatus.textContent = `${data.hospitals.length} hospitals found — click to start voice session`;
+    micButton.style.opacity = "1";
+    micButton.style.pointerEvents = "auto";
   } catch (err) {
     hospitalsList.innerHTML = '<div class="empty-state"><p>Error loading hospitals. Please try again.</p></div>';
   }
@@ -297,113 +287,138 @@ function toggleCard(el, id) {
   el.classList.toggle("selected");
 }
 
-// === Voice Session (Mock) ===
-function toggleVoiceSession() {
+// === ElevenLabs Voice Session ===
+async function toggleVoiceSession() {
   if (state.sessionActive) {
-    stopSession();
+    await stopSession();
   } else {
-    startSession();
+    await startSession();
   }
 }
 
-function startSession() {
-  state.sessionActive = true;
-  state.triageStep = 0;
-  voiceAgent.classList.add("active");
-  agentBadge.style.display = "inline-block";
-  voiceStatus.textContent = "Session active — listening...";
+async function startSession() {
+  if (state.hospitals.length === 0) {
+    addMessage("agent", "Please wait for hospitals to load before starting a voice session.");
+    return;
+  }
 
-  setTimeout(() => {
-    if (state.hospitals.length > 0) {
-      addMessage("agent", `I've found ${state.hospitals.length} hospitals near you. Let me ask a few questions to find the best match for your situation.`);
-      setTimeout(() => askTriageQuestion(), 1000);
-    } else {
-      addMessage("agent", "I'm still looking for hospitals near you. In the meantime, let me understand your situation.");
-      setTimeout(() => askTriageQuestion(), 1000);
+  voiceStatus.textContent = "Connecting...";
+
+  try {
+    // Get signed URL from backend
+    const res = await fetch("/api/signed-url");
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.detail || "Failed to get signed URL");
     }
-  }, 500);
+    const { signedUrl } = await res.json();
+
+    // Prepare hospital data for the agent prompt
+    const hospitalsForAgent = state.hospitals.map((h) => ({
+      name: h.name,
+      address: h.address,
+      phone: h.phone,
+      distance_miles: h.distance_miles,
+      specialties: h.specialties,
+      hours: h.hours,
+      insurance_accepted: h.insurance_accepted,
+      rating: h.rating,
+      website: h.website,
+      web_details: h.web_details,
+    }));
+
+    // Start ElevenLabs conversation
+    state.conversation = await Conversation.startSession({
+      signedUrl,
+      dynamicVariables: {
+        hospitals_data: JSON.stringify(hospitalsForAgent, null, 2),
+      },
+      clientTools: {
+        display_recommendations: async (params) => {
+          showRecommendationsFromAgent(params);
+          return "Recommendations displayed successfully in the UI.";
+        },
+      },
+      onMessage: (msg) => {
+        addMessage("agent", msg.message);
+      },
+      onUserTranscript: (transcript) => {
+        // Only show final transcripts, not interim
+        if (transcript.isFinal !== false) {
+          addMessage("user", transcript.message);
+        }
+      },
+      onStatusChange: (status) => {
+        updateVoiceStatus(status);
+      },
+      onError: (error) => {
+        console.error("ElevenLabs error:", error);
+        addMessage("agent", "I'm having trouble with the connection. Please try again.");
+        stopSession();
+      },
+      onDisconnect: () => {
+        stopSession();
+      },
+    });
+
+    state.sessionActive = true;
+    voiceAgent.classList.add("active");
+    agentBadge.style.display = "inline-block";
+    voiceStatus.textContent = "Session active — listening...";
+  } catch (err) {
+    console.error("Failed to start session:", err);
+    voiceStatus.textContent = "Connection failed. Click to retry.";
+    addMessage("agent", `Could not start voice session: ${err.message}`);
+  }
 }
 
-function stopSession() {
+async function stopSession() {
+  if (state.conversation) {
+    try {
+      await state.conversation.endSession();
+    } catch {
+      // Session may already be ended
+    }
+    state.conversation = null;
+  }
   state.sessionActive = false;
   voiceAgent.classList.remove("active");
   agentBadge.style.display = "none";
   voiceStatus.textContent = "Session ended. Click to restart.";
-  addMessage("agent", "Session ended. Click the microphone to start a new session.");
 }
 
-function askTriageQuestion() {
-  if (state.triageStep < triageQuestions.length) {
-    const q = triageQuestions[state.triageStep];
-    addMessage("agent", q.question);
-  }
+function updateVoiceStatus(status) {
+  const statusMap = {
+    connecting: "Connecting...",
+    connected: "Connected — listening...",
+    listening: "Listening...",
+    speaking: "Agent speaking...",
+    processing: "Thinking...",
+    disconnected: "Disconnected",
+  };
+  voiceStatus.textContent = statusMap[status] || status;
 }
 
-// === Chat / Text Input ===
-function handleSend() {
-  const text = textInput.value.trim();
-  if (!text) return;
-  textInput.value = "";
+// === Display Recommendations from Agent's client tool ===
+function showRecommendationsFromAgent(params) {
+  const { hospital_1_name, hospital_1_reason, hospital_2_name, hospital_2_reason } = params;
 
-  addMessage("user", text);
-
-  if (!state.sessionActive) {
-    startSession();
-    return;
-  }
-
-  if (state.triageStep < triageQuestions.length) {
-    const key = triageQuestions[state.triageStep].key;
-    state.triageData[key] = text;
-    state.triageStep++;
-
-    if (state.triageStep < triageQuestions.length) {
-      setTimeout(() => {
-        addMessage("agent", "Got it, thank you.");
-        setTimeout(() => askTriageQuestion(), 800);
-      }, 500);
-    } else {
-      setTimeout(() => {
-        addMessage("agent", "Thank you for all that information. Let me analyze the hospitals near you and find the best match...");
-        setTimeout(() => fetchRecommendations(), 1500);
-      }, 500);
-    }
-  }
-}
-
-async function fetchRecommendations() {
-  try {
-    const params = new URLSearchParams({
-      lat: state.lat,
-      lng: state.lng,
-      symptoms: state.triageData.symptoms,
-      insurance: state.triageData.insurance,
-    });
-    const res = await fetch(`/api/recommend?${params}`);
-    const data = await res.json();
-    showRecommendations(data.recommendations);
-  } catch {
-    addMessage("agent", "I had trouble getting recommendations. Please check the hospital list above for options.");
-  }
-}
-
-function showRecommendations(recs) {
-  if (!recs || recs.length < 2) {
-    addMessage("agent", "I couldn't find enough hospitals to compare. Please check the list above.");
-    return;
-  }
-  const r1 = recs[0];
-  const r2 = recs[1];
-
-  addMessage(
-    "agent",
-    `Based on your symptoms, location, and preferences, I recommend two hospitals:\n\n` +
-    `**1. ${r1.name}** — ${r1.distance_miles} miles away\n` +
-    `${r1.reasons.join(". ")}.\n\n` +
-    `**2. ${r2.name}** — ${r2.distance_miles} miles away\n` +
-    `${r2.reasons.join(". ")}.\n\n` +
-    `Would you like to call either of these hospitals?`
+  // Find matching hospitals from our data
+  const rec1 = state.hospitals.find((h) =>
+    h.name.toLowerCase().includes(hospital_1_name.toLowerCase()) ||
+    hospital_1_name.toLowerCase().includes(h.name.toLowerCase())
   );
+  const rec2 = state.hospitals.find((h) =>
+    h.name.toLowerCase().includes(hospital_2_name.toLowerCase()) ||
+    hospital_2_name.toLowerCase().includes(h.name.toLowerCase())
+  );
+
+  const recs = [
+    { hospital: rec1, name: hospital_1_name, reason: hospital_1_reason },
+    { hospital: rec2, name: hospital_2_name, reason: hospital_2_reason },
+  ].filter((r) => r.hospital);
+
+  if (recs.length === 0) return;
 
   recommendationsSection.style.display = "block";
   recommendationsList.innerHTML = recs
@@ -411,20 +426,20 @@ function showRecommendations(recs) {
       (r) => `
     <div class="rec-card">
       <div class="card-top">
-        <span class="card-name">${r.name}</span>
-        ${r.rating !== null ? `<span class="card-rating">⭐ ${r.rating}</span>` : ""}
+        <span class="card-name">${r.hospital.name}</span>
+        ${r.hospital.rating !== null ? `<span class="card-rating">⭐ ${r.hospital.rating}</span>` : ""}
       </div>
-      <div class="card-address">${r.address}</div>
+      <div class="card-address">${r.hospital.address}</div>
       <div class="card-meta">
-        <span class="meta-tag distance">${r.distance_miles} mi</span>
-        ${r.er_wait_minutes !== null ? `<span class="meta-tag wait">~${r.er_wait_minutes} min wait</span>` : ""}
+        <span class="meta-tag distance">${r.hospital.distance_miles} mi</span>
+        ${r.hospital.er_wait_minutes !== null ? `<span class="meta-tag wait">~${r.hospital.er_wait_minutes} min wait</span>` : ""}
       </div>
       <div class="rec-reasons">
-        ${r.reasons.map((reason) => `<div class="rec-reason">${reason}</div>`).join("")}
+        <div class="rec-reason">${r.reason}</div>
       </div>
       <div class="card-actions" style="margin-top:12px">
-        ${r.phone !== "N/A" ? `<a href="tel:${r.phone}" class="btn btn-call">📞 Call ${r.name} — ${r.phone}</a>` : ""}
-        <a href="https://www.openstreetmap.org/?mlat=${r.lat}&mlon=${r.lng}#map=16/${r.lat}/${r.lng}" target="_blank" rel="noopener" class="btn btn-outline btn-sm">🗺 View on Map</a>
+        ${r.hospital.phone !== "N/A" ? `<a href="tel:${r.hospital.phone}" class="btn btn-call">📞 Call ${r.hospital.name} — ${r.hospital.phone}</a>` : ""}
+        <a href="https://www.openstreetmap.org/?mlat=${r.hospital.lat}&mlon=${r.hospital.lng}#map=16/${r.hospital.lat}/${r.hospital.lng}" target="_blank" rel="noopener" class="btn btn-outline btn-sm">🗺 View on Map</a>
       </div>
     </div>
   `
@@ -440,9 +455,9 @@ function addMessage(role, text) {
   div.className = "msg " + role;
   const formatted = text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>").replace(/\n/g, "<br>");
   div.innerHTML = `<span class="msg-label">${role === "agent" ? "Agent" : "You"}</span><p>${formatted}</p>`;
-  conversation.appendChild(div);
-  conversation.scrollTop = conversation.scrollHeight;
+  conversationLog.appendChild(div);
+  conversationLog.scrollTop = conversationLog.scrollHeight;
 }
 
-// Expose toggleCard globally
+// Expose toggleCard globally (used by onclick in rendered HTML)
 window.toggleCard = toggleCard;
