@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Emergency Hospital Finder</title>
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="app">
+    <!-- Emergency Banner -->
+    <div class="emergency-banner">
+      <span class="banner-icon">⚠️</span>
+      If this is a life-threatening emergency, call <a href="tel:911">911</a> immediately.
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+      <div class="header-content">
+        <div class="logo">
+          <div class="logo-icon">🏥</div>
+          <div>
+            <h1>Emergency Hospital Finder</h1>
+            <p class="tagline">AI-powered voice assistant to find the right hospital for you</p>
+          </div>
+        </div>
+        <div class="location-status" id="locationStatus">
+          <span class="status-dot"></span>
+          <span class="status-text">Detecting location...</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+      <!-- Left Panel: Voice Agent + Triage -->
+      <section class="panel voice-panel">
+        <div class="panel-header">
+          <h2>Voice Assistant</h2>
+          <span class="badge badge-live" id="agentBadge" style="display:none">LIVE</span>
+        </div>
+
+        <!-- Voice Agent Placeholder -->
+        <div class="voice-agent" id="voiceAgent">
+          <div class="voice-rings" id="voiceRings">
+            <div class="ring ring-1"></div>
+            <div class="ring ring-2"></div>
+            <div class="ring ring-3"></div>
+            <div class="mic-button" id="micButton">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                <line x1="12" y1="19" x2="12" y2="23"/>
+                <line x1="8" y1="23" x2="16" y2="23"/>
+              </svg>
+            </div>
+          </div>
+          <p class="voice-status" id="voiceStatus">Click to start voice session</p>
+          <p class="voice-hint">Powered by ElevenLabs</p>
+        </div>
+
+        <!-- Conversation Log -->
+        <div class="conversation" id="conversation">
+          <div class="msg agent">
+            <span class="msg-label">Agent</span>
+            <p>Hello! I'm your emergency hospital finder assistant. I'll help you find the best hospital for your situation. Let me start by confirming your location, then I'll ask a few questions about what you need.</p>
+          </div>
+        </div>
+
+        <!-- Manual Input Fallback -->
+        <div class="manual-input">
+          <div class="input-row">
+            <input type="text" id="textInput" placeholder="Type your response here..." />
+            <button id="sendButton" class="btn btn-primary">Send</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Panel: Map + Hospital Results -->
+      <section class="panel results-panel">
+        <!-- Map -->
+        <div class="map-container" id="mapContainer">
+          <div class="map-placeholder" id="mapPlaceholder">
+            <div class="map-grid">
+              <div class="map-dot user-dot" id="userDot" style="display:none">
+                <span class="dot-pulse"></span>
+                <span class="dot-label">You</span>
+              </div>
+            </div>
+            <p class="map-note">Map view — will populate with your location</p>
+          </div>
+        </div>
+
+        <!-- Hospital Cards -->
+        <div class="hospitals-section">
+          <div class="section-header">
+            <h2>Nearby Hospitals</h2>
+            <button class="btn btn-outline btn-sm" id="refreshBtn">Refresh</button>
+          </div>
+          <div class="hospitals-list" id="hospitalsList">
+            <div class="empty-state">
+              <p>Allow location access to discover nearby hospitals, or enter your address above.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recommendations -->
+        <div class="recommendations-section" id="recommendationsSection" style="display:none">
+          <h2>🎯 Recommended For You</h2>
+          <div class="recommendations-list" id="recommendationsList"></div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Address Fallback Modal -->
+    <div class="modal-overlay" id="addressModal" style="display:none">
+      <div class="modal">
+        <h3>Enter Your Location</h3>
+        <p>We couldn't detect your location automatically. Please enter an address or allow location access.</p>
+        <input type="text" id="addressInput" placeholder="e.g., 123 Main St, Chicago, IL" />
+        <div class="modal-actions">
+          <button class="btn btn-primary" id="addressSubmit">Find Hospitals</button>
+          <button class="btn btn-outline" id="retryLocation">Retry Location</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
