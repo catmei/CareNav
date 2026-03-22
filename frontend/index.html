@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Emergency Hospital Finder</title>
   <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -83,15 +84,7 @@
       <section class="panel results-panel">
         <!-- Map -->
         <div class="map-container" id="mapContainer">
-          <div class="map-placeholder" id="mapPlaceholder">
-            <div class="map-grid">
-              <div class="map-dot user-dot" id="userDot" style="display:none">
-                <span class="dot-pulse"></span>
-                <span class="dot-label">You</span>
-              </div>
-            </div>
-            <p class="map-note">Map view — will populate with your location</p>
-          </div>
+          <div id="map" style="height:100%;width:100%"></div>
         </div>
 
         <!-- Hospital Cards -->
@@ -115,12 +108,37 @@
       </section>
     </main>
 
+    <!-- Location Choice Modal (shown on load) -->
+    <div class="modal-overlay" id="locationChoiceModal">
+      <div class="modal location-choice-modal">
+        <div class="modal-icon">📍</div>
+        <h3>Find Hospitals Near You</h3>
+        <p>How would you like to share your location?</p>
+        <div class="location-choice-buttons">
+          <button class="btn btn-primary btn-choice" id="useGpsBtn">
+            <span class="choice-icon">🎯</span>
+            <span>
+              <strong>Use My Location</strong>
+              <small>Automatically detect via GPS</small>
+            </span>
+          </button>
+          <button class="btn btn-outline btn-choice" id="enterAddressBtn">
+            <span class="choice-icon">✏️</span>
+            <span>
+              <strong>Enter an Address</strong>
+              <small>Type a street address or city</small>
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Address Fallback Modal -->
     <div class="modal-overlay" id="addressModal" style="display:none">
       <div class="modal">
         <h3>Enter Your Location</h3>
         <p>We couldn't detect your location automatically. Please enter an address or allow location access.</p>
-        <input type="text" id="addressInput" placeholder="e.g., 123 Main St, Chicago, IL" />
+        <input type="text" id="addressInput" placeholder="e.g., 123 Main St, New York, NY" />
         <div class="modal-actions">
           <button class="btn btn-primary" id="addressSubmit">Find Hospitals</button>
           <button class="btn btn-outline" id="retryLocation">Retry Location</button>
@@ -129,6 +147,7 @@
     </div>
   </div>
 
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="/app.js"></script>
 </body>
 </html>

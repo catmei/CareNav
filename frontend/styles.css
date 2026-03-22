@@ -270,52 +270,61 @@ a:hover { text-decoration: underline; }
 
 /* === Map === */
 .map-container {
-  height: 220px;
-  background: var(--surface-2);
+  height: 280px;
   border-bottom: 1px solid var(--border);
   position: relative;
   overflow: hidden;
 }
-.map-placeholder {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-}
-.map-grid {
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(var(--border) 1px, transparent 1px),
-    linear-gradient(90deg, var(--border) 1px, transparent 1px);
-  background-size: 40px 40px;
-  opacity: 0.5;
-}
-.map-note { font-size: 13px; color: var(--text-dim); z-index: 1; }
 
-.user-dot {
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 2;
+/* Leaflet dark theme overrides */
+.leaflet-popup-content-wrapper {
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
 }
-.dot-pulse {
-  display: block;
-  width: 14px; height: 14px;
+.leaflet-popup-tip { background: var(--surface-2); }
+.leaflet-popup-content { margin: 10px 14px; font-size: 13px; line-height: 1.5; }
+.leaflet-popup-content strong { color: var(--text); }
+.leaflet-container a.leaflet-popup-close-button { color: var(--text-dim); }
+.leaflet-container a.leaflet-popup-close-button:hover { color: var(--text); }
+.leaflet-control-zoom a {
+  background: var(--surface-2) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+}
+.leaflet-control-zoom a:hover { background: var(--surface) !important; }
+.leaflet-control-attribution {
+  background: rgba(19, 24, 37, 0.8) !important;
+  color: var(--text-dim) !important;
+  font-size: 10px !important;
+}
+.leaflet-control-attribution a { color: var(--accent) !important; }
+
+/* Custom map markers */
+.user-map-dot {
+  width: 16px; height: 16px;
   background: var(--accent);
   border-radius: 50%;
-  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 0 0 5px rgba(59, 130, 246, 0.35);
 }
-.dot-label {
-  position: absolute;
-  top: 20px; left: 50%;
-  transform: translateX(-50%);
+.hospital-map-pin {
+  width: 24px; height: 24px;
+  background: #0F9D58;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 11px;
-  font-weight: 600;
-  color: var(--accent);
-  white-space: nowrap;
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.hospital-map-pin.selected-pin {
+  background: #EA4335;
+  box-shadow: 0 0 0 4px rgba(234, 67, 53, 0.35), 0 2px 6px rgba(0,0,0,0.5);
 }
 
 .hospital-marker {
@@ -476,6 +485,26 @@ a:hover { text-decoration: underline; }
 .modal input:focus { border-color: var(--accent); }
 .modal-actions { display: flex; gap: 8px; }
 
+/* Location choice modal */
+.location-choice-modal { text-align: center; max-width: 400px; }
+.modal-icon { font-size: 40px; margin-bottom: 12px; }
+.location-choice-modal h3 { font-size: 20px; margin-bottom: 6px; }
+.location-choice-modal p { margin-bottom: 24px; }
+.location-choice-buttons { display: flex; flex-direction: column; gap: 12px; }
+.btn-choice {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  text-align: left;
+  border-radius: var(--radius);
+  width: 100%;
+}
+.btn-choice .choice-icon { font-size: 22px; flex-shrink: 0; }
+.btn-choice span:last-child { display: flex; flex-direction: column; gap: 2px; }
+.btn-choice strong { font-size: 15px; font-weight: 600; }
+.btn-choice small { font-size: 12px; opacity: 0.7; font-weight: 400; }
+
 /* === Scrollbar === */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
@@ -484,6 +513,6 @@ a:hover { text-decoration: underline; }
 /* === Responsive === */
 @media (max-width: 900px) {
   .main { grid-template-columns: 1fr; }
-  .map-container { height: 180px; }
+  .map-container { height: 200px; }
   .conversation { max-height: 200px; }
 }

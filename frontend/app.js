@@ -25,8 +25,9 @@ const retryLocation = $("#retryLocation");
 const refreshBtn = $("#refreshBtn");
 const recommendationsSection = $("#recommendationsSection");
 const recommendationsList = $("#recommendationsList");
-const mapPlaceholder = $("#mapPlaceholder");
-const userDot = $("#userDot");
+const locationChoiceModal = $("#locationChoiceModal");
+const useGpsBtn = $("#useGpsBtn");
+const enterAddressBtn = $("#enterAddressBtn");
 
 // === Triage conversation flow ===
 const triageQuestions = [
@@ -36,9 +37,86 @@ const triageQuestions = [
   { key: "insurance", question: "Do you have a preferred insurance provider? This helps me find hospitals that accept your plan. You can skip this if you prefer." },
 ];
 
+// === Map ===
+let map = null;
+let userMarker = null;
+let hospitalMarkers = [];
+
+function initMap(lat, lng) {
+  if (!map) {
+    map = L.map("map").setView([lat, lng], 13);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      maxZoom: 18,
+    }).addTo(map);
+  } else {
+    map.setView([lat, lng], 13);
+  }
+}
+
+function showUserOnMap() {
+  initMap(state.lat, state.lng);
+  if (userMarker) userMarker.remove();
+  const icon = L.divIcon({
+    className: "",
+    html: '<div class="user-map-dot"></div>',
+    iconSize: [16, 16],
+    iconAnchor: [8, 8],
+  });
+  userMarker = L.marker([state.lat, state.lng], { icon }).addTo(map);
+}
+
+function plotHospitalsOnMap(hospitals) {
+  hospitalMarkers.forEach((m) => m.remove());
+  hospitalMarkers = [];
+
+  hospitals.forEach((h, i) => {
+    const icon = L.divIcon({
+      className: "",
+      html: `<div class="hospital-map-pin">${i + 1}</div>`,
+      iconSize: [24, 24],
+      iconAnchor: [12, 12],
+    });
+    const marker = L.marker([h.lat, h.lng], { icon }).addTo(map);
+    marker.on("click", () => {
+      // Reset all pins to default color
+      hospitalMarkers.forEach((m) => {
+        m.getElement()?.querySelector(".hospital-map-pin")?.classList.remove("selected-pin");
+      });
+      // Highlight clicked pin
+      marker.getElement()?.querySelector(".hospital-map-pin")?.classList.add("selected-pin");
+      const card = document.getElementById("card-" + h.id);
+      if (card) { card.scrollIntoView({ behavior: "smooth" }); card.click(); }
+    });
+    hospitalMarkers.push(marker);
+  });
+
+  // Fit map to show user + all hospitals
+  if (hospitals.length > 0) {
+    const bounds = L.latLngBounds([
+      [state.lat, state.lng],
+      ...hospitals.map((h) => [h.lat, h.lng]),
+    ]);
+    map.fitBounds(bounds, { padding: [24, 24] });
+  }
+}
+
 // === Init ===
 document.addEventListener("DOMContentLoaded", () => {
-  detectLocation();
+  // Show location choice first — don't request GPS without consent
+  locationChoiceModal.style.display = "flex";
+  setLocationStatus("detecting", "Waiting for location...");
+
+  useGpsBtn.addEventListener("click", () => {
+    locationChoiceModal.style.display = "none";
+    detectLocation();
+  });
+
+  enterAddressBtn.addEventListener("click", () => {
+    locationChoiceModal.style.display = "none";
+    showAddressModal();
+  });
+
   micButton.addEventListener("click", toggleVoiceSession);
   sendButton.addEventListener("click", handleSend);
   textInput.addEventListener("keydown", (e) => { if (e.key === "Enter") handleSend(); });
@@ -77,50 +155,39 @@ function setLocationStatus(type, text) {
 }
 
 function showAddressModal() {
+  const input = $("#addressInput");
+  if (!input.value) input.value = "476 5th Ave, New York, NY 10018";
   addressModal.style.display = "flex";
 }
 
-function handleAddressSubmit() {
-  // Mock geocoding — use Chicago coordinates as default
-  state.lat = 41.8781;
-  state.lng = -87.6298;
-  setLocationStatus("active", $("#addressInput").value || "Chicago, IL (default)");
+async function handleAddressSubmit() {
+  const address = $("#addressInput").value.trim();
+  if (!address) return;
+
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json&limit=1`,
+      { headers: { "Accept-Language": "en" } }
+    );
+    const data = await res.json();
+    if (data.length > 0) {
+      state.lat = parseFloat(data[0].lat);
+      state.lng = parseFloat(data[0].lon);
+      setLocationStatus("active", address);
+    } else {
+      state.lat = 40.7128;
+      state.lng = -74.0060;
+      setLocationStatus("active", "New York, NY (default)");
+    }
+  } catch {
+    state.lat = 41.8781;
+    state.lng = -87.6298;
+    setLocationStatus("active", "Chicago, IL (default)");
+  }
+
   addressModal.style.display = "none";
   showUserOnMap();
   fetchHospitals();
-}
-
-// === Map ===
-function showUserOnMap() {
-  userDot.style.display = "block";
-  const noteEl = mapPlaceholder.querySelector(".map-note");
-  if (noteEl) noteEl.textContent = "Your location detected";
-}
-
-function plotHospitalsOnMap(hospitals) {
-  // Remove existing markers
-  mapPlaceholder.querySelectorAll(".hospital-marker").forEach((m) => m.remove());
-
-  hospitals.forEach((h, i) => {
-    const marker = document.createElement("div");
-    marker.className = "hospital-marker";
-    // Spread markers around the center dot
-    const angle = (i / hospitals.length) * 2 * Math.PI - Math.PI / 2;
-    const radius = 30 + h.distance_miles * 15;
-    const x = 50 + Math.cos(angle) * Math.min(radius, 40);
-    const y = 50 + Math.sin(angle) * Math.min(radius, 35);
-    marker.style.left = x + "%";
-    marker.style.top = y + "%";
-    marker.innerHTML = `
-      <div class="marker-dot"></div>
-      <div class="marker-label">${h.name.split(" ")[0]}</div>
-    `;
-    marker.addEventListener("click", () => {
-      const card = document.getElementById("card-" + h.id);
-      if (card) { card.scrollIntoView({ behavior: "smooth" }); card.click(); }
-    });
-    mapPlaceholder.appendChild(marker);
-  });
 }
 
 // === Fetch Hospitals ===
@@ -138,32 +205,28 @@ async function fetchHospitals() {
 }
 
 function renderHospitals(hospitals) {
+  if (!hospitals.length) {
+    hospitalsList.innerHTML = '<div class="empty-state"><p>No hospitals found nearby.</p></div>';
+    return;
+  }
   hospitalsList.innerHTML = hospitals
     .map(
       (h) => `
     <div class="hospital-card" id="card-${h.id}" onclick="toggleCard(this, '${h.id}')">
       <div class="card-top">
         <span class="card-name">${h.name}</span>
-        <span class="card-rating">⭐ ${h.rating}</span>
+        ${h.rating !== null ? `<span class="card-rating">⭐ ${h.rating}</span>` : ""}
       </div>
       <div class="card-address">${h.address}</div>
       <div class="card-meta">
         <span class="meta-tag distance">${h.distance_miles} mi</span>
-        <span class="meta-tag wait">~${h.er_wait_minutes} min wait</span>
-        <span class="meta-tag">${h.specialties[0]}</span>
+        ${h.er_wait_minutes !== null ? `<span class="meta-tag wait">~${h.er_wait_minutes} min wait</span>` : ""}
+        <span class="meta-tag">${h.specialties[0] || "Hospital"}</span>
       </div>
       <div class="card-details">
         <div class="detail-section">
-          <div class="detail-label">About</div>
-          <div class="detail-text">${h.firecrawl_summary.official_info}</div>
-        </div>
-        <div class="detail-section">
-          <div class="detail-label">Patient Reviews</div>
-          <div class="detail-text">${h.firecrawl_summary.reviews_summary}</div>
-        </div>
-        <div class="detail-section">
-          <div class="detail-label">Recent News</div>
-          <div class="detail-text">${h.firecrawl_summary.recent_news}</div>
+          <div class="detail-label">Hours</div>
+          <div class="detail-text">${h.hours}</div>
         </div>
         <div class="detail-section">
           <div class="detail-label">Specialties</div>
@@ -171,12 +234,19 @@ function renderHospitals(hospitals) {
             ${h.specialties.map((s) => `<span class="specialty-tag">${s}</span>`).join("")}
           </div>
         </div>
+        ${h.insurance_accepted.length ? `
         <div class="detail-section">
           <div class="detail-label">Insurance Accepted</div>
           <div class="detail-text">${h.insurance_accepted.join(", ")}</div>
-        </div>
+        </div>` : ""}
+        ${h.website ? `
+        <div class="detail-section">
+          <div class="detail-label">Website</div>
+          <div class="detail-text"><a href="${h.website}" target="_blank" rel="noopener">${h.website}</a></div>
+        </div>` : ""}
         <div class="card-actions">
-          <a href="tel:${h.phone}" class="btn btn-call btn-sm">📞 Call ${h.phone}</a>
+          ${h.phone !== "N/A" ? `<a href="tel:${h.phone}" class="btn btn-call btn-sm">📞 Call ${h.phone}</a>` : ""}
+          <a href="https://www.openstreetmap.org/?mlat=${h.lat}&mlon=${h.lng}#map=16/${h.lat}/${h.lng}" target="_blank" rel="noopener" class="btn btn-outline btn-sm">🗺 View on Map</a>
         </div>
       </div>
     </div>
@@ -210,7 +280,6 @@ function startSession() {
   agentBadge.style.display = "inline-block";
   voiceStatus.textContent = "Session active — listening...";
 
-  // Start triage after a beat
   setTimeout(() => {
     if (state.hospitals.length > 0) {
       addMessage("agent", `I've found ${state.hospitals.length} hospitals near you. Let me ask a few questions to find the best match for your situation.`);
@@ -250,7 +319,6 @@ function handleSend() {
     return;
   }
 
-  // Process triage answer
   if (state.triageStep < triageQuestions.length) {
     const key = triageQuestions[state.triageStep].key;
     state.triageData[key] = text;
@@ -262,7 +330,6 @@ function handleSend() {
         setTimeout(() => askTriageQuestion(), 800);
       }, 500);
     } else {
-      // All questions answered — get recommendations
       setTimeout(() => {
         addMessage("agent", "Thank you for all that information. Let me analyze the hospitals near you and find the best match...");
         setTimeout(() => fetchRecommendations(), 1500);
@@ -288,20 +355,23 @@ async function fetchRecommendations() {
 }
 
 function showRecommendations(recs) {
+  if (!recs || recs.length < 2) {
+    addMessage("agent", "I couldn't find enough hospitals to compare. Please check the list above.");
+    return;
+  }
   const r1 = recs[0];
   const r2 = recs[1];
 
   addMessage(
     "agent",
     `Based on your symptoms, location, and preferences, I recommend two hospitals:\n\n` +
-    `**1. ${r1.name}** — ${r1.distance_miles} miles away (${r1.rating} stars)\n` +
+    `**1. ${r1.name}** — ${r1.distance_miles} miles away\n` +
     `${r1.reasons.join(". ")}.\n\n` +
-    `**2. ${r2.name}** — ${r2.distance_miles} miles away (${r2.rating} stars)\n` +
+    `**2. ${r2.name}** — ${r2.distance_miles} miles away\n` +
     `${r2.reasons.join(". ")}.\n\n` +
-    `Would you like to call either of these hospitals? I can provide their phone number.`
+    `Would you like to call either of these hospitals?`
   );
 
-  // Show recommendation cards
   recommendationsSection.style.display = "block";
   recommendationsList.innerHTML = recs
     .map(
@@ -309,18 +379,19 @@ function showRecommendations(recs) {
     <div class="rec-card">
       <div class="card-top">
         <span class="card-name">${r.name}</span>
-        <span class="card-rating">⭐ ${r.rating}</span>
+        ${r.rating !== null ? `<span class="card-rating">⭐ ${r.rating}</span>` : ""}
       </div>
       <div class="card-address">${r.address}</div>
       <div class="card-meta">
         <span class="meta-tag distance">${r.distance_miles} mi</span>
-        <span class="meta-tag wait">~${r.er_wait_minutes} min wait</span>
+        ${r.er_wait_minutes !== null ? `<span class="meta-tag wait">~${r.er_wait_minutes} min wait</span>` : ""}
       </div>
       <div class="rec-reasons">
         ${r.reasons.map((reason) => `<div class="rec-reason">${reason}</div>`).join("")}
       </div>
       <div class="card-actions" style="margin-top:12px">
-        <a href="tel:${r.phone}" class="btn btn-call">📞 Call ${r.name} — ${r.phone}</a>
+        ${r.phone !== "N/A" ? `<a href="tel:${r.phone}" class="btn btn-call">📞 Call ${r.name} — ${r.phone}</a>` : ""}
+        <a href="https://www.openstreetmap.org/?mlat=${r.lat}&mlon=${r.lng}#map=16/${r.lat}/${r.lng}" target="_blank" rel="noopener" class="btn btn-outline btn-sm">🗺 View on Map</a>
       </div>
     </div>
   `
@@ -334,7 +405,6 @@ function showRecommendations(recs) {
 function addMessage(role, text) {
   const div = document.createElement("div");
   div.className = "msg " + role;
-  // Simple markdown-ish bold support
   const formatted = text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>").replace(/\n/g, "<br>");
   div.innerHTML = `<span class="msg-label">${role === "agent" ? "Agent" : "You"}</span><p>${formatted}</p>`;
   conversation.appendChild(div);
