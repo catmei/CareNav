@@ -194,7 +194,7 @@ async function handleAddressSubmit() {
 async function fetchHospitals() {
   hospitalsList.innerHTML = '<div class="empty-state"><p>Searching nearby hospitals...</p></div>';
   try {
-    const res = await fetch(`/api/hospitals?lat=${state.lat}&lng=${state.lng}`);
+    const res = await fetch(`/api/hospitals/enriched?lat=${state.lat}&lng=${state.lng}`);
     const data = await res.json();
     state.hospitals = data.hospitals;
     renderHospitals(data.hospitals);
@@ -244,6 +244,7 @@ function renderHospitals(hospitals) {
           <div class="detail-label">Website</div>
           <div class="detail-text"><a href="${h.website}" target="_blank" rel="noopener">${h.website}</a></div>
         </div>` : ""}
+        ${renderWebDetails(h.web_details)}
         <div class="card-actions">
           ${h.phone !== "N/A" ? `<a href="tel:${h.phone}" class="btn btn-call btn-sm">📞 Call ${h.phone}</a>` : ""}
           <a href="https://www.openstreetmap.org/?mlat=${h.lat}&mlon=${h.lng}#map=16/${h.lat}/${h.lng}" target="_blank" rel="noopener" class="btn btn-outline btn-sm">🗺 View on Map</a>
@@ -253,6 +254,38 @@ function renderHospitals(hospitals) {
   `
     )
     .join("");
+}
+
+// === Web Details renderer ===
+const WEB_DETAIL_LABELS = {
+  specialties_services: "Specialties & Services",
+  insurance_accepted:   "Insurance Accepted",
+  patient_rating:       "Patient Rating & Reviews",
+};
+
+function renderWebDetails(web_details) {
+  if (!web_details) return "";
+  const items = Object.entries(WEB_DETAIL_LABELS)
+    .map(([key, label]) => {
+      const results = web_details[key];
+      if (!results || !results.length) return "";
+      const links = results.map((r) => `
+        <a class="web-detail-title" href="${r.url}" target="_blank" rel="noopener">${r.title}</a>
+        ${r.description ? `<div class="web-detail-desc">${r.description}</div>` : ""}`
+      ).join("");
+      return `
+        <div class="web-detail-item">
+          <div class="web-detail-label">${label}</div>
+          ${links}
+        </div>`;
+    })
+    .join("");
+  if (!items.trim()) return "";
+  return `
+    <div class="detail-section web-details-section">
+      <div class="detail-label">Web Results</div>
+      <div class="web-details-list">${items}</div>
+    </div>`;
 }
 
 // Toggle card expand

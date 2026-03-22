@@ -9,9 +9,11 @@ wheels/
 # Virtual environments
 .venv
 
-.claude/
+.env
 
+.claude/
 hackathon.md
 prd.md
 skills-lock.json
 todo.md
+add scrape for the full info "firecrawl"

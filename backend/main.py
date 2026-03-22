@@ -1,10 +1,13 @@
 """FastAPI backend for Emergency Hospital Finder."""
 
-import math
+import asyncio
 import httpx
 from fastapi import FastAPI, Query, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+
+from backend.map_utils import fetch_overpass_hospitals, normalize_hospital, OVERPASS_URL
+from backend.firecrawl_utils import firecrawl_search_hospital_details
 
 app = FastAPI(title="Emergency Hospital Finder")
 
@@ -14,95 +17,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-OVERPASS_URL = "https://overpass-api.de/api/interpreter"
-SEARCH_RADIUS_METERS = 10000  # 10 km
-
-
-def haversine_distance(lat1: float, lng1: float, lat2: float, lng2: float) -> float:
-    """Calculate distance in miles between two coordinates."""
-    R = 3959  # Earth radius in miles
-    dlat = math.radians(lat2 - lat1)
-    dlng = math.radians(lng2 - lng1)
-    a = (
-        math.sin(dlat / 2) ** 2
-        + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(dlng / 2) ** 2
-    )
-    return R * 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-
-
-def fetch_overpass_hospitals(lat: float, lng: float, radius: int = SEARCH_RADIUS_METERS) -> list:
-    """Query Overpass API for nearby hospitals."""
-    query = f"""
-    [out:json][timeout:25];
-    (
-      node["amenity"="hospital"](around:{radius},{lat},{lng});
-      way["amenity"="hospital"](around:{radius},{lat},{lng});
-      relation["amenity"="hospital"](around:{radius},{lat},{lng});
-    );
-    out center;
-    """
-    try:
-        resp = httpx.post(OVERPASS_URL, data={"data": query}, timeout=30)
-        resp.raise_for_status()
-        return resp.json().get("elements", [])
-    except Exception:
-        return []
-
-
-def normalize_hospital(element: dict, user_lat: float, user_lng: float) -> dict | None:
-    """Convert an Overpass element into our hospital schema."""
-    tags = element.get("tags", {})
-
-    # Nodes have lat/lon directly; ways/relations have it under "center"
-    lat = element.get("lat") or element.get("center", {}).get("lat")
-    lng = element.get("lon") or element.get("center", {}).get("lon")
-    if not lat or not lng:
-        return None
-
-    name = tags.get("name", "").strip()
-    if not name:
-        return None
-
-    # Build address from OSM addr:* tags
-    housenumber = tags.get("addr:housenumber", "").strip()
-    street = tags.get("addr:street", "").strip()
-    city = tags.get("addr:city", "").strip()
-    state_tag = tags.get("addr:state", "").strip()
-    addr_parts = [f"{housenumber} {street}".strip(), city, state_tag]
-    address = ", ".join(p for p in addr_parts if p) or "Address not available"
-
-    phone = (
-        tags.get("phone", tags.get("contact:phone", tags.get("telephone", ""))).strip()
-    )
-    website = tags.get("website", tags.get("contact:website", "")).strip()
-    hours = tags.get("opening_hours", "").strip() or "Call ahead"
-
-    # healthcare:speciality is a semicolon-separated OSM tag
-    spec_raw = tags.get("healthcare:speciality", "").strip()
-    specialties = (
-        [s.strip().title() for s in spec_raw.split(";") if s.strip()]
-        if spec_raw
-        else ["Emergency Medicine"]
-    )
-
-    dist = haversine_distance(user_lat, user_lng, lat, lng)
-
-    return {
-        "id": str(element["id"]),
-        "name": name,
-        "address": address,
-        "phone": phone or "N/A",
-        "lat": lat,
-        "lng": lng,
-        "distance_miles": round(dist, 1),
-        "rating": None,           # not available from OSM
-        "specialties": specialties,
-        "er_wait_minutes": None,  # not available from OSM
-        "insurance_accepted": [],
-        "hours": hours,
-        "website": website,
-    }
 
 
 @app.get("/api/hospitals")
@@ -144,6 +58,36 @@ def get_hospital_detail(hospital_id: str):
         raise
     except Exception:
         raise HTTPException(status_code=502, detail="Overpass API error")
+
+
+@app.get("/api/hospitals/enriched")
+async def get_enriched_hospitals(
+    lat: float = Query(..., description="User latitude"),
+    lng: float = Query(..., description="User longitude"),
+):
+    """Return the 5 nearest hospitals, each enriched with 5 targeted web searches (25 total).
+
+    Each hospital gains a ``web_details`` object with keys:
+      official_website, contact_hours, specialties_services,
+      insurance_accepted, patient_rating.
+    Requires the FIRECRAWL_API_KEY environment variable.
+    """
+    elements = fetch_overpass_hospitals(lat, lng)
+    hospitals = [h for el in elements if (h := normalize_hospital(el, lat, lng))]
+    hospitals.sort(key=lambda x: x["distance_miles"])
+    top5 = hospitals[:5]
+
+    async with httpx.AsyncClient() as client:
+        tasks = [firecrawl_search_hospital_details(client, h["name"]) for h in top5]
+        web_details_per_hospital = await asyncio.gather(*tasks)
+
+    enriched = [
+        {**hospital, "web_details": web_details}
+        for hospital, web_details in zip(top5, web_details_per_hospital)
+    ]
+
+    print(enriched)
+    return {"hospitals": enriched}
 
 
 @app.get("/api/recommend")
