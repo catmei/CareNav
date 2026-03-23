@@ -43,16 +43,22 @@ Question 5 (card_number=5, label="Insurance"):
 
 IMPORTANT: Call update_triage_card EVERY time you get an answer. Do not batch them. Call it immediately after each answer before moving to the next question.
 
+TRANSITION PHASE:
+After the user answers Question 5 (Insurance):
+1. IMMEDIATELY call update_triage_card for card 5 with their answer.
+2. THEN say something like: "Great, thank you for all that information. Let me review the nearby hospitals and find the best match for you. Just one moment."
+3. WAIT for the user to acknowledge (e.g. "okay", "sure", "go ahead") before proceeding to the Recommendation Phase.
+
 RECOMMENDATION PHASE:
-After all 5 questions are answered:
-1. Based on their answers and the hospital data (specialties, distance, web research, insurance), recommend the TOP 2 best-fit hospitals.
-2. For each recommendation, explain:
+After the user acknowledges the transition:
+1. Based on their answers and the hospital data (specialties, distance, web research, insurance), choose the single BEST-FIT hospital.
+2. FIRST, call the display_recommendation tool to show the hospital card in the UI BEFORE you speak about it.
+3. THEN verbally tell the user your recommendation:
    - Hospital name and distance
-   - Why it's a good fit (matching specialty, reviews, insurance, etc.)
+   - Why it's the best fit (matching specialty, reviews, insurance, etc.)
    - Any notable capabilities or review highlights from the web research
-3. After presenting recommendations verbally, use the display_recommendations tool to show clickable cards in the UI.
-4. Read out the phone number of the top recommendation.
-5. Ask if they'd like more information or want to end the session.
+   - Read out the phone number
+4. Ask if they'd like more information or want to end the session.
 
 GUIDELINES:
 - Keep responses concise — this is voice, not text. Short sentences.
@@ -116,38 +122,25 @@ def create_agent():
                         },
                         {
                             "type": "client",
-                            "name": "display_recommendations",
+                            "name": "display_recommendation",
                             "description": (
-                                "Display the top 2 recommended hospitals as clickable cards "
-                                "with phone numbers in the user's browser. "
-                                "Call this after you've verbally presented your recommendations."
+                                "Display the single best recommended hospital as a clickable card "
+                                "with phone number in the user's browser. "
+                                "Call this BEFORE you verbally present the recommendation."
                             ),
                             "parameters": {
                                 "type": "object",
                                 "properties": {
-                                    "hospital_1_name": {
+                                    "hospital_name": {
                                         "type": "string",
-                                        "description": "Name of the first recommended hospital",
+                                        "description": "Name of the recommended hospital",
                                     },
-                                    "hospital_1_reason": {
-                                        "type": "string",
-                                        "description": "Brief reason why this hospital is recommended",
-                                    },
-                                    "hospital_2_name": {
-                                        "type": "string",
-                                        "description": "Name of the second recommended hospital",
-                                    },
-                                    "hospital_2_reason": {
+                                    "reason": {
                                         "type": "string",
                                         "description": "Brief reason why this hospital is recommended",
                                     },
                                 },
-                                "required": [
-                                    "hospital_1_name",
-                                    "hospital_1_reason",
-                                    "hospital_2_name",
-                                    "hospital_2_reason",
-                                ],
+                                "required": ["hospital_name", "reason"],
                             },
                         }
                     ],

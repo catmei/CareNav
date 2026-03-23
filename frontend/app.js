@@ -12,8 +12,9 @@ const state = {
 // === DOM refs ===
 const $ = (sel) => document.querySelector(sel);
 const locationStatus = $("#locationStatus");
-const hospitalsList = $("#hospitalsList");
-const conversationLog = $("#conversation");
+const hospitalDetail = $("#hospitalDetail");
+const liveCaption = $("#liveCaption");
+const liveCaptionText = $("#liveCaptionText");
 const voiceAgent = $("#voiceAgent");
 const micButton = $("#micButton");
 const voiceStatus = $("#voiceStatus");
@@ -22,77 +23,134 @@ const addressModal = $("#addressModal");
 const addressSubmit = $("#addressSubmit");
 const retryLocation = $("#retryLocation");
 const refreshBtn = $("#refreshBtn");
-const recommendationsSection = $("#recommendationsSection");
-const recommendationsList = $("#recommendationsList");
 const locationChoiceModal = $("#locationChoiceModal");
 const useGpsBtn = $("#useGpsBtn");
 const enterAddressBtn = $("#enterAddressBtn");
 
-// === Map ===
+// === Google Map ===
 let map = null;
 let userMarker = null;
 let hospitalMarkers = [];
+let mapsReady = false;
+
+async function loadGoogleMaps() {
+  if (mapsReady) return;
+  try {
+    const res = await fetch("/api/maps-key");
+    if (!res.ok) throw new Error("Could not fetch maps key");
+    const data = await res.json();
+    const key = data.key;
+    if (!key) throw new Error("GOOGLE_MAPS_API_KEY is empty");
+    await new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${key}&loading=async`;
+      script.async = true;
+      script.onload = resolve;
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+    mapsReady = true;
+  } catch (err) {
+    console.error("Failed to load Google Maps:", err);
+  }
+}
 
 function initMap(lat, lng) {
+  if (!mapsReady) return;
   if (!map) {
-    map = L.map("map").setView([lat, lng], 13);
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-      maxZoom: 18,
-    }).addTo(map);
+    map = new google.maps.Map(document.getElementById("map"), {
+      center: { lat, lng },
+      zoom: 13,
+      styles: [
+        { elementType: "geometry", stylers: [{ color: "#1d2c4d" }] },
+        { elementType: "labels.text.stroke", stylers: [{ color: "#1a3646" }] },
+        { elementType: "labels.text.fill", stylers: [{ color: "#8ec3b9" }] },
+        { featureType: "water", elementType: "geometry.fill", stylers: [{ color: "#0e1626" }] },
+        { featureType: "road", elementType: "geometry", stylers: [{ color: "#304a7d" }] },
+        { featureType: "road", elementType: "geometry.stroke", stylers: [{ color: "#255763" }] },
+        { featureType: "poi", elementType: "geometry", stylers: [{ color: "#283d6a" }] },
+      ],
+      disableDefaultUI: false,
+      zoomControl: true,
+      mapTypeControl: false,
+      streetViewControl: false,
+      fullscreenControl: false,
+    });
   } else {
-    map.setView([lat, lng], 13);
+    map.setCenter({ lat, lng });
+    map.setZoom(13);
   }
 }
 
 function showUserOnMap() {
+  if (!mapsReady) return;
   initMap(state.lat, state.lng);
-  if (userMarker) userMarker.remove();
-  const icon = L.divIcon({
-    className: "",
-    html: '<div class="user-map-dot"></div>',
-    iconSize: [16, 16],
-    iconAnchor: [8, 8],
+  if (userMarker) userMarker.setMap(null);
+  userMarker = new google.maps.Marker({
+    position: { lat: state.lat, lng: state.lng },
+    map,
+    icon: {
+      path: google.maps.SymbolPath.CIRCLE,
+      scale: 10,
+      fillColor: "#3b82f6",
+      fillOpacity: 1,
+      strokeColor: "#ffffff",
+      strokeWeight: 3,
+    },
+    title: "Your Location",
+    zIndex: 999,
   });
-  userMarker = L.marker([state.lat, state.lng], { icon }).addTo(map);
 }
 
 function plotHospitalsOnMap(hospitals) {
-  hospitalMarkers.forEach((m) => m.remove());
+  if (!mapsReady || !map) return;
+  hospitalMarkers.forEach((m) => m.setMap(null));
   hospitalMarkers = [];
 
+  const bounds = new google.maps.LatLngBounds();
+  bounds.extend({ lat: state.lat, lng: state.lng });
+
   hospitals.forEach((h, i) => {
-    const icon = L.divIcon({
-      className: "",
-      html: `<div class="hospital-map-pin">${i + 1}</div>`,
-      iconSize: [24, 24],
-      iconAnchor: [12, 12],
+    const marker = new google.maps.Marker({
+      position: { lat: h.lat, lng: h.lng },
+      map,
+      label: {
+        text: String(i + 1),
+        color: "#ffffff",
+        fontWeight: "bold",
+        fontSize: "12px",
+      },
+      icon: {
+        path: google.maps.SymbolPath.CIRCLE,
+        scale: 14,
+        fillColor: "#F5A623",
+        fillOpacity: 1,
+        strokeColor: "#ffffff",
+        strokeWeight: 2,
+      },
+      title: h.name,
     });
-    const marker = L.marker([h.lat, h.lng], { icon }).addTo(map);
-    marker.on("click", () => {
-      hospitalMarkers.forEach((m) => {
-        m.getElement()?.querySelector(".hospital-map-pin")?.classList.remove("selected-pin");
-      });
-      marker.getElement()?.querySelector(".hospital-map-pin")?.classList.add("selected-pin");
-      const card = document.getElementById("card-" + h.id);
-      if (card) { card.scrollIntoView({ behavior: "smooth" }); card.click(); }
+
+    marker.addListener("click", () => {
+      selectHospital(h.id);
     });
+
     hospitalMarkers.push(marker);
+    bounds.extend({ lat: h.lat, lng: h.lng });
   });
 
   if (hospitals.length > 0) {
-    const bounds = L.latLngBounds([
-      [state.lat, state.lng],
-      ...hospitals.map((h) => [h.lat, h.lng]),
-    ]);
-    map.fitBounds(bounds, { padding: [24, 24] });
+    map.fitBounds(bounds, { padding: 40 });
   }
 }
 
 // === Init ===
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   locationChoiceModal.style.display = "flex";
   setLocationStatus("detecting", "Waiting for location...");
+
+  // Start loading Google Maps early
+  await loadGoogleMaps();
 
   useGpsBtn.addEventListener("click", () => {
     locationChoiceModal.style.display = "none";
@@ -177,7 +235,7 @@ async function handleAddressSubmit() {
 
 // === Fetch Hospitals ===
 async function fetchHospitals() {
-  hospitalsList.innerHTML = '<div class="empty-state"><p>Searching nearby hospitals...</p></div>';
+  hospitalDetail.innerHTML = '<div class="empty-state"><p>Searching nearby hospitals...</p></div>';
   try {
     const res = await fetch(`/api/hospitals/enriched?lat=${state.lat}&lng=${state.lng}`);
     const data = await res.json();
@@ -190,60 +248,92 @@ async function fetchHospitals() {
     micButton.style.opacity = "1";
     micButton.style.pointerEvents = "auto";
   } catch (err) {
-    hospitalsList.innerHTML = '<div class="empty-state"><p>Error loading hospitals. Please try again.</p></div>';
+    hospitalDetail.innerHTML = '<div class="empty-state"><p>Error loading hospitals. Please try again.</p></div>';
   }
 }
 
 function renderHospitals(hospitals) {
   if (!hospitals.length) {
-    hospitalsList.innerHTML = '<div class="empty-state"><p>No hospitals found nearby.</p></div>';
+    hospitalDetail.innerHTML = '<div class="empty-state"><p>No hospitals found nearby.</p></div>';
     return;
   }
-  hospitalsList.innerHTML = hospitals
-    .map(
-      (h) => `
-    <div class="hospital-card" id="card-${h.id}" onclick="toggleCard(this, '${h.id}')">
-      <div class="card-top">
-        <span class="card-name">${h.name}</span>
-        ${h.rating !== null ? `<span class="card-rating">⭐ ${h.rating}</span>` : ""}
+
+  // Show the first hospital by default
+  selectHospital(hospitals[0].id);
+}
+
+function selectHospital(id, recommendation) {
+  const h = state.hospitals.find((h) => h.id === id);
+  if (!h) return;
+
+  // Highlight marker on map
+  const idx = state.hospitals.findIndex((h) => h.id === id);
+  if (idx >= 0) {
+    hospitalMarkers.forEach((m, i) => {
+      m.setIcon({
+        path: google.maps.SymbolPath.CIRCLE,
+        scale: i === idx ? 16 : 14,
+        fillColor: i === idx ? "#EA4335" : "#F5A623",
+        fillOpacity: 1,
+        strokeColor: "#ffffff",
+        strokeWeight: i === idx ? 3 : 2,
+      });
+    });
+  }
+
+  // Format hours: show "Open 24 hours" once if all days are the same, otherwise list per line
+  let hoursDisplay = h.hours;
+  if (h.hours && h.hours !== "Call ahead") {
+    const parts = h.hours.split("; ");
+    const allSame = parts.length === 7 && parts.every((p) => p.includes("Open 24 hours"));
+    if (allSame) {
+      hoursDisplay = "Open 24 hours";
+    } else {
+      hoursDisplay = parts.join("<br>");
+    }
+  }
+
+  // Recommendation badge
+  const recBadge = recommendation
+    ? `<div class="rec-badge"><span class="rec-badge-icon">✓</span> Recommended — ${recommendation}</div>`
+    : "";
+
+  // Render detail panel
+  hospitalDetail.innerHTML = `
+    <div class="hospital-detail-card${recommendation ? " recommended" : ""}" id="card-${h.id}">
+      ${recBadge}
+      <div class="detail-header">
+        <div>
+          <div class="card-name">${h.name}</div>
+          <div class="card-address">${h.address}</div>
+        </div>
+        ${h.rating !== null ? `<span class="card-rating">⭐ ${h.rating}${h.user_ratings_total ? ` (${h.user_ratings_total})` : ""}</span>` : ""}
       </div>
-      <div class="card-address">${h.address}</div>
-      <div class="card-meta">
+
+      <div class="detail-info-row">
         <span class="meta-tag distance">${h.distance_miles} mi</span>
         ${h.er_wait_minutes !== null ? `<span class="meta-tag wait">~${h.er_wait_minutes} min wait</span>` : ""}
-        <span class="meta-tag">${h.specialties[0] || "Hospital"}</span>
+        <span class="detail-hours">${hoursDisplay}</span>
       </div>
-      <div class="card-details">
-        <div class="detail-section">
-          <div class="detail-label">Hours</div>
-          <div class="detail-text">${h.hours}</div>
-        </div>
-        <div class="detail-section">
-          <div class="detail-label">Specialties</div>
-          <div class="specialties-list">
-            ${h.specialties.map((s) => `<span class="specialty-tag">${s}</span>`).join("")}
-          </div>
-        </div>
-        ${h.insurance_accepted.length ? `
-        <div class="detail-section">
-          <div class="detail-label">Insurance Accepted</div>
-          <div class="detail-text">${h.insurance_accepted.join(", ")}</div>
-        </div>` : ""}
-        ${h.website ? `
-        <div class="detail-section">
-          <div class="detail-label">Website</div>
-          <div class="detail-text"><a href="${h.website}" target="_blank" rel="noopener">${h.website}</a></div>
-        </div>` : ""}
-        ${renderWebDetails(h.web_details)}
-        <div class="card-actions">
-          ${h.phone !== "N/A" ? `<a href="tel:${h.phone}" class="btn btn-call btn-sm">📞 Call ${h.phone}</a>` : ""}
-          <a href="https://www.openstreetmap.org/?mlat=${h.lat}&mlon=${h.lng}#map=16/${h.lat}/${h.lng}" target="_blank" rel="noopener" class="btn btn-outline btn-sm">🗺 View on Map</a>
-        </div>
+
+      <div class="detail-actions-row">
+        ${h.phone !== "N/A" ? `<a href="tel:${h.phone}" class="btn btn-call btn-sm">📞 ${h.phone}</a>` : ""}
+        ${h.website ? `<a href="${h.website}" target="_blank" rel="noopener" class="btn btn-outline btn-sm">🌐 Website</a>` : ""}
+        <a href="${h.google_maps_url || `https://www.google.com/maps/search/?api=1&query=${h.lat},${h.lng}`}" target="_blank" rel="noopener" class="btn btn-outline btn-sm">🗺 Directions</a>
       </div>
+
+      ${h.insurance_accepted.length ? `
+      <div class="detail-section">
+        <div class="detail-label">Insurance</div>
+        <div class="detail-text">${h.insurance_accepted.join(", ")}</div>
+      </div>` : ""}
+      ${renderWebDetails(h.web_details)}
     </div>
-  `
-    )
-    .join("");
+  `;
+
+  if (recommendation) {
+    hospitalDetail.scrollIntoView({ behavior: "smooth" });
+  }
 }
 
 // === Web Details renderer ===
@@ -273,19 +363,24 @@ function renderWebDetails(web_details) {
   if (!items.trim()) return "";
   return `
     <div class="detail-section web-details-section">
-      <div class="detail-label">Web Results</div>
-      <div class="web-details-list">${items}</div>
+      <div class="firecrawl-toggle" onclick="toggleFirecrawl(this)">
+        <span class="firecrawl-label">🔥 Firecrawl</span>
+        <span class="firecrawl-arrow">&#9654;</span>
+      </div>
+      <div class="web-details-list firecrawl-collapsed">${items}</div>
     </div>`;
 }
 
-// Toggle card expand
-function toggleCard(el, id) {
-  document.querySelectorAll(".hospital-card").forEach((c) => {
-    if (c !== el) c.classList.remove("expanded", "selected");
-  });
-  el.classList.toggle("expanded");
-  el.classList.toggle("selected");
+function toggleFirecrawl(el) {
+  const list = el.nextElementSibling;
+  const arrow = el.querySelector(".firecrawl-arrow");
+  list.classList.toggle("firecrawl-collapsed");
+  arrow.classList.toggle("firecrawl-open");
 }
+window.toggleFirecrawl = toggleFirecrawl;
+
+// Select hospital (used by tabs and map markers)
+// (selectHospital is defined above in renderHospitalTabs section)
 
 // === ElevenLabs Voice Session ===
 async function toggleVoiceSession() {
@@ -298,7 +393,7 @@ async function toggleVoiceSession() {
 
 async function startSession() {
   if (state.hospitals.length === 0) {
-    addMessage("agent", "Please wait for hospitals to load before starting a voice session.");
+    showCaption( "Please wait for hospitals to load before starting a voice session.");
     return;
   }
 
@@ -319,7 +414,6 @@ async function startSession() {
       address: h.address,
       phone: h.phone,
       distance_miles: h.distance_miles,
-      specialties: h.specialties,
       hours: h.hours,
       insurance_accepted: h.insurance_accepted,
       rating: h.rating,
@@ -340,26 +434,26 @@ async function startSession() {
           console.log("[update_triage_card] Card", params.card_number, "updated with:", params.answer);
           return "Triage card updated successfully.";
         },
-        display_recommendations: async (params) => {
-          showRecommendationsFromAgent(params);
-          return "Recommendations displayed successfully in the UI.";
+        display_recommendation: async (params) => {
+          showRecommendationFromAgent(params);
+          return "Recommendation displayed successfully in the UI.";
         },
       },
       onMessage: (msg) => {
-        addMessage("agent", msg.message);
+        showCaption(msg.message);
       },
-      onUserTranscript: (transcript) => {
-        // Only show final transcripts, not interim
-        if (transcript.isFinal !== false) {
-          addMessage("user", transcript.message);
-        }
+      onUserTranscript: () => {
+        // No-op: only show agent speech as live caption
       },
       onStatusChange: (status) => {
         updateVoiceStatus(status);
+        if (status === "listening" || status === "processing") {
+          clearCaption();
+        }
       },
       onError: (error) => {
         console.error("ElevenLabs error:", error);
-        addMessage("agent", "I'm having trouble with the connection. Please try again.");
+        showCaption( "I'm having trouble with the connection. Please try again.");
         stopSession();
       },
       onDisconnect: () => {
@@ -375,7 +469,7 @@ async function startSession() {
   } catch (err) {
     console.error("Failed to start session:", err);
     voiceStatus.textContent = "Connection failed. Click to retry.";
-    addMessage("agent", `Could not start voice session: ${err.message}`);
+    showCaption( `Could not start voice session: ${err.message}`);
   }
 }
 
@@ -392,6 +486,8 @@ async function stopSession() {
   voiceAgent.classList.remove("active");
   agentBadge.style.display = "none";
   voiceStatus.textContent = "Session ended. Click to restart.";
+  clearCaption();
+  liveCaptionText.textContent = "Transcript will appear here...";
 }
 
 function updateVoiceStatus(status) {
@@ -406,54 +502,18 @@ function updateVoiceStatus(status) {
   voiceStatus.textContent = statusMap[status] || status;
 }
 
-// === Display Recommendations from Agent's client tool ===
-function showRecommendationsFromAgent(params) {
-  const { hospital_1_name, hospital_1_reason, hospital_2_name, hospital_2_reason } = params;
+// === Display Recommendation from Agent's client tool ===
+function showRecommendationFromAgent(params) {
+  const { hospital_name, reason } = params;
 
-  // Find matching hospitals from our data
-  const rec1 = state.hospitals.find((h) =>
-    h.name.toLowerCase().includes(hospital_1_name.toLowerCase()) ||
-    hospital_1_name.toLowerCase().includes(h.name.toLowerCase())
-  );
-  const rec2 = state.hospitals.find((h) =>
-    h.name.toLowerCase().includes(hospital_2_name.toLowerCase()) ||
-    hospital_2_name.toLowerCase().includes(h.name.toLowerCase())
+  const hospital = state.hospitals.find((h) =>
+    h.name.toLowerCase().includes(hospital_name.toLowerCase()) ||
+    hospital_name.toLowerCase().includes(h.name.toLowerCase())
   );
 
-  const recs = [
-    { hospital: rec1, name: hospital_1_name, reason: hospital_1_reason },
-    { hospital: rec2, name: hospital_2_name, reason: hospital_2_reason },
-  ].filter((r) => r.hospital);
+  if (!hospital) return;
 
-  if (recs.length === 0) return;
-
-  recommendationsSection.style.display = "block";
-  recommendationsList.innerHTML = recs
-    .map(
-      (r) => `
-    <div class="rec-card">
-      <div class="card-top">
-        <span class="card-name">${r.hospital.name}</span>
-        ${r.hospital.rating !== null ? `<span class="card-rating">⭐ ${r.hospital.rating}</span>` : ""}
-      </div>
-      <div class="card-address">${r.hospital.address}</div>
-      <div class="card-meta">
-        <span class="meta-tag distance">${r.hospital.distance_miles} mi</span>
-        ${r.hospital.er_wait_minutes !== null ? `<span class="meta-tag wait">~${r.hospital.er_wait_minutes} min wait</span>` : ""}
-      </div>
-      <div class="rec-reasons">
-        <div class="rec-reason">${r.reason}</div>
-      </div>
-      <div class="card-actions" style="margin-top:12px">
-        ${r.hospital.phone !== "N/A" ? `<a href="tel:${r.hospital.phone}" class="btn btn-call">📞 Call ${r.hospital.name} — ${r.hospital.phone}</a>` : ""}
-        <a href="https://www.openstreetmap.org/?mlat=${r.hospital.lat}&mlon=${r.hospital.lng}#map=16/${r.hospital.lat}/${r.hospital.lng}" target="_blank" rel="noopener" class="btn btn-outline btn-sm">🗺 View on Map</a>
-      </div>
-    </div>
-  `
-    )
-    .join("");
-
-  recommendationsSection.scrollIntoView({ behavior: "smooth" });
+  selectHospital(hospital.id, reason);
 }
 
 // === Triage Card Updates ===
@@ -499,15 +559,66 @@ function resetTriageCards() {
   if (first) first.classList.add("active");
 }
 
-// === Chat helpers ===
-function addMessage(role, text) {
-  const div = document.createElement("div");
-  div.className = "msg " + role;
-  const formatted = text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>").replace(/\n/g, "<br>");
-  div.innerHTML = `<span class="msg-label">${role === "agent" ? "Agent" : "You"}</span><p>${formatted}</p>`;
-  conversationLog.appendChild(div);
-  conversationLog.scrollTop = conversationLog.scrollHeight;
+// === Live Caption helpers ===
+function showCaption(text) {
+  const formatted = text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>").replace(/\n/g, " ");
+  liveCaptionText.innerHTML = formatted;
+  liveCaption.classList.add("speaking");
 }
 
-// Expose toggleCard globally (used by onclick in rendered HTML)
-window.toggleCard = toggleCard;
+function clearCaption() {
+  liveCaption.classList.remove("speaking");
+  liveCaptionText.textContent = "";
+}
+
+// === Debug Tools ===
+const debugTriageBtn = $("#debugTriageBtn");
+const debugRecommendBtn = $("#debugRecommendBtn");
+const debugResetBtn = $("#debugResetBtn");
+
+let debugTriageStep = 0;
+const debugTriageData = [
+  { card_number: 1, answer: "No, not life-threatening" },
+  { card_number: 2, answer: "Headache and mild fever" },
+  { card_number: 3, answer: "5/10 - Moderate" },
+  { card_number: 4, answer: "Since yesterday" },
+  { card_number: 5, answer: "Blue Cross" },
+];
+
+debugTriageBtn.addEventListener("click", () => {
+  if (debugTriageStep === 0) resetTriageCards();
+  if (debugTriageStep < debugTriageData.length) {
+    const data = debugTriageData[debugTriageStep];
+    updateTriageCard(data);
+    showCaption(`[Debug] Triage card ${data.card_number}: ${data.answer}`);
+    debugTriageStep++;
+  } else {
+    showCaption("[Debug] All triage cards filled. Try Simulate Recommend.");
+  }
+});
+
+debugRecommendBtn.addEventListener("click", () => {
+  if (state.hospitals.length === 0) {
+    showCaption("[Debug] No hospitals loaded yet.");
+    return;
+  }
+  const h = state.hospitals[0];
+  showRecommendationFromAgent({
+    hospital_name: h.name,
+    reason: "Closest hospital with matching specialty and good reviews",
+  });
+  showCaption(`[Debug] Recommended: ${h.name}`);
+});
+
+debugResetBtn.addEventListener("click", () => {
+  resetTriageCards();
+  debugTriageStep = 0;
+  clearCaption();
+  liveCaptionText.textContent = "Transcript will appear here...";
+  if (state.hospitals.length > 0) {
+    selectHospital(state.hospitals[0].id);
+  }
+});
+
+// Expose selectHospital globally (used by onclick in rendered HTML)
+window.selectHospital = selectHospital;

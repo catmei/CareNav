@@ -1,9 +1,10 @@
-"""Map and hospital data utilities (Overpass / OpenStreetMap)."""
+"""Hospital data utilities using Google Places API (New)."""
 
+import os
 import math
 import httpx
 
-OVERPASS_URL = "https://overpass-api.de/api/interpreter"
+PLACES_NEARBY_URL = "https://places.googleapis.com/v1/places:searchNearby"
 SEARCH_RADIUS_METERS = 10000  # 10 km
 
 
@@ -19,75 +20,99 @@ def haversine_distance(lat1: float, lng1: float, lat2: float, lng2: float) -> fl
     return R * 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
 
 
-def fetch_overpass_hospitals(lat: float, lng: float, radius: int = SEARCH_RADIUS_METERS) -> list:
-    """Query Overpass API for nearby hospitals."""
-    query = f"""
-    [out:json][timeout:25];
-    (
-      node["amenity"="hospital"](around:{radius},{lat},{lng});
-      way["amenity"="hospital"](around:{radius},{lat},{lng});
-      relation["amenity"="hospital"](around:{radius},{lat},{lng});
-    );
-    out center;
-    """
+async def fetch_google_hospitals(
+    client: httpx.AsyncClient, lat: float, lng: float, radius: int = SEARCH_RADIUS_METERS
+) -> list:
+    """Query Google Places Nearby Search for hospitals."""
+    api_key = os.getenv("GOOGLE_MAPS_API_KEY", "")
+    if not api_key:
+        return []
+
+    headers = {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": api_key,
+        "X-Goog-FieldMask": (
+            "places.id,"
+            "places.displayName,"
+            "places.formattedAddress,"
+            "places.nationalPhoneNumber,"
+            "places.internationalPhoneNumber,"
+            "places.rating,"
+            "places.userRatingCount,"
+            "places.websiteUri,"
+            "places.regularOpeningHours,"
+            "places.googleMapsUri,"
+            "places.location,"
+            "places.types"
+        ),
+    }
+
+    body = {
+        "includedTypes": ["hospital"],
+        "locationRestriction": {
+            "circle": {
+                "center": {"latitude": lat, "longitude": lng},
+                "radius": float(radius),
+            }
+        },
+        "maxResultCount": 20,
+    }
+
     try:
-        resp = httpx.post(OVERPASS_URL, data={"data": query}, timeout=30)
+        resp = await client.post(PLACES_NEARBY_URL, json=body, headers=headers, timeout=30)
         resp.raise_for_status()
-        return resp.json().get("elements", [])
+        return resp.json().get("places", [])
     except Exception:
         return []
 
 
-def normalize_hospital(element: dict, user_lat: float, user_lng: float) -> dict | None:
-    """Convert an Overpass element into our hospital schema."""
-    tags = element.get("tags", {})
-
-    # Nodes have lat/lon directly; ways/relations have it under "center"
-    lat = element.get("lat") or element.get("center", {}).get("lat")
-    lng = element.get("lon") or element.get("center", {}).get("lon")
-    if not lat or not lng:
-        return None
-
-    name = tags.get("name", "").strip()
+def normalize_hospital(place: dict, user_lat: float, user_lng: float) -> dict | None:
+    """Convert a Google Places result into our hospital schema."""
+    display_name = place.get("displayName", {})
+    name = display_name.get("text", "").strip() if isinstance(display_name, dict) else str(display_name).strip()
     if not name:
         return None
 
-    # Build address from OSM addr:* tags
-    housenumber = tags.get("addr:housenumber", "").strip()
-    street = tags.get("addr:street", "").strip()
-    city = tags.get("addr:city", "").strip()
-    state_tag = tags.get("addr:state", "").strip()
-    addr_parts = [f"{housenumber} {street}".strip(), city, state_tag]
-    address = ", ".join(p for p in addr_parts if p) or "Address not available"
+    location = place.get("location", {})
+    lat = location.get("latitude")
+    lng = location.get("longitude")
+    if not lat or not lng:
+        return None
+
+    address = place.get("formattedAddress", "Address not available")
 
     phone = (
-        tags.get("phone", tags.get("contact:phone", tags.get("telephone", ""))).strip()
+        place.get("nationalPhoneNumber", "")
+        or place.get("internationalPhoneNumber", "")
     )
-    website = tags.get("website", tags.get("contact:website", "")).strip()
-    hours = tags.get("opening_hours", "").strip() or "Call ahead"
 
-    # healthcare:speciality is a semicolon-separated OSM tag
-    spec_raw = tags.get("healthcare:speciality", "").strip()
-    specialties = (
-        [s.strip().title() for s in spec_raw.split(";") if s.strip()]
-        if spec_raw
-        else ["Emergency Medicine"]
-    )
+    website = place.get("websiteUri", "")
+
+    # Parse opening hours
+    reg_hours = place.get("regularOpeningHours", {})
+    weekday_descriptions = reg_hours.get("weekdayDescriptions", [])
+    hours = "; ".join(weekday_descriptions) if weekday_descriptions else "Call ahead"
+
+    rating = place.get("rating")
+    user_ratings_total = place.get("userRatingCount")
+
+    google_maps_url = place.get("googleMapsUri", "")
 
     dist = haversine_distance(user_lat, user_lng, lat, lng)
 
     return {
-        "id": str(element["id"]),
+        "id": place.get("id", ""),
         "name": name,
         "address": address,
         "phone": phone or "N/A",
         "lat": lat,
         "lng": lng,
         "distance_miles": round(dist, 1),
-        "rating": None,           # not available from OSM
-        "specialties": specialties,
-        "er_wait_minutes": None,  # not available from OSM
+        "rating": rating,
+        "user_ratings_total": user_ratings_total,
+        "er_wait_minutes": None,  # not available from Google
         "insurance_accepted": [],
         "hours": hours,
         "website": website,
+        "google_maps_url": google_maps_url,
     }

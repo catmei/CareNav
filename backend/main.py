@@ -11,7 +11,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from elevenlabs import ElevenLabs
 
-from backend.map_utils import fetch_overpass_hospitals, normalize_hospital
+from backend.map_utils import fetch_google_hospitals, normalize_hospital
 from backend.firecrawl_utils import firecrawl_search_hospital_details
 
 load_dotenv(Path(__file__).resolve().parent.parent / ".env")
@@ -31,27 +31,28 @@ async def get_enriched_hospitals(
     lat: float = Query(..., description="User latitude"),
     lng: float = Query(..., description="User longitude"),
 ):
-    """Return the 5 nearest hospitals, each enriched with 5 targeted web searches (25 total).
+    """Return the 5 nearest hospitals, each enriched with targeted web searches.
 
     Each hospital gains a ``web_details`` object with keys:
-      official_website, contact_hours, specialties_services,
-      insurance_accepted, patient_rating.
-    Requires the FIRECRAWL_API_KEY environment variable.
+      specialties_services, insurance_accepted, patient_rating.
+    Requires GOOGLE_MAPS_API_KEY and optionally FIRECRAWL_API_KEY.
     """
     cache_path = Path(__file__).resolve().parent / "cached_hospitals.json"
 
-    # If cache exists, skip Overpass + Firecrawl entirely
+    # If cache exists, skip API calls entirely
     if cache_path.exists():
         return json.loads(cache_path.read_text(encoding="utf-8"))
 
-    elements = fetch_overpass_hospitals(lat, lng)
-    hospitals = [h for el in elements if (h := normalize_hospital(el, lat, lng))]
-    hospitals.sort(key=lambda x: x["distance_miles"])
-    top5 = hospitals[:5]
-
     async with httpx.AsyncClient() as client:
-        tasks = [firecrawl_search_hospital_details(client, h["name"]) for h in top5]
-        web_details_per_hospital = await asyncio.gather(*tasks)
+        # Fetch hospitals from Google Places API
+        places = await fetch_google_hospitals(client, lat, lng)
+        hospitals = [h for p in places if (h := normalize_hospital(p, lat, lng))]
+        hospitals.sort(key=lambda x: x["distance_miles"])
+        top5 = hospitals[:5]
+
+        # Enrich with Firecrawl web search results
+        fc_tasks = [firecrawl_search_hospital_details(client, h["name"]) for h in top5]
+        web_details_per_hospital = await asyncio.gather(*fc_tasks)
 
     enriched = [
         {**hospital, "web_details": web_details}
@@ -64,6 +65,15 @@ async def get_enriched_hospitals(
     cache_path.write_text(json.dumps(result, indent=2, ensure_ascii=False), encoding="utf-8")
 
     return result
+
+
+@app.get("/api/maps-key")
+def get_maps_key():
+    """Return the Google Maps API key for the frontend."""
+    api_key = os.getenv("GOOGLE_MAPS_API_KEY", "")
+    if not api_key:
+        raise HTTPException(status_code=500, detail="GOOGLE_MAPS_API_KEY not configured")
+    return {"key": api_key}
 
 
 @app.get("/api/signed-url")

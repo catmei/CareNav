@@ -1,427 +1,26 @@
 {
   "hospitals": [
     {
-      "id": "13287358562",
-      "name": "Manhattan Gastroenterology – Midtown Manhattan",
-      "address": "56 West 45th Street, New York, NY",
-      "phone": "+1-212-533-2400",
-      "lat": 40.7561643,
-      "lng": -73.9818704,
-      "distance_miles": 0.2,
-      "rating": null,
-      "specialties": [
-        "Gastroenterology"
-      ],
-      "er_wait_minutes": null,
-      "insurance_accepted": [],
-      "hours": "Mo-Th 07:30-19:00; Fr 07:30-17:00; Sa, Su off",
-      "website": "https://www.manhattangastroenterology.com/new-york/midtown/",
-      "web_details": {
-        "specialties_services": [
-          {
-            "title": "Manhattan Gastroenterology: NYC Gastroenterologist",
-            "url": "https://www.manhattangastroenterology.com/",
-            "description": "Our services encompass screenings for colon cancer and various conditions affecting the colon, small intestine, and upper gastrointestinal tract. We are ..."
-          },
-          {
-            "title": "Gastroenterologist Midtown - Manhattan Gastroenterology",
-            "url": "https://www.manhattangastroenterology.com/new-york/midtown/",
-            "description": "Gastroenterology Services in Midtown West, Manhattan · Hemorrhoids · Laser Hemorrhoid Removal · Colonoscopy · Breath Testing · Upper Endoscopy · High ..."
-          },
-          {
-            "title": "MANHATTAN GASTROENTEROLOGY - Updated March 2026 - Yelp",
-            "url": "https://www.yelp.com/biz/manhattan-gastroenterology-new-york-20",
-            "description": "Specialties. We are proud to offer state of the art medical, gastroenterology and endoscopy services with a personalized touch. Through our integrative ..."
-          },
-          {
-            "title": "Gastroenterologists - Manhattan Specialty Care",
-            "url": "https://www.manhattanspecialtycare.com/gastroenterologist/",
-            "description": "As a practicing gastroenterologist, Dr. Schopis has a special interest in prevention, colon cancer screening, inflammatory bowel disease, and Irritable Bowel ..."
-          },
-          {
-            "title": "Manhattan Gastroenterology (New York) - Book Appointment Online!",
-            "url": "https://www.zocdoc.com/practice/manhattan-gastroenterology-3131",
-            "description": "Manhattan Gastroenterology is a dynamic, modern gastroenterology practice delivering high quality individualized health care in multiple convenient locations ..."
-          }
-        ],
-        "insurance_accepted": [
-          {
-            "title": "Gastroenterologist Insurance NYC - Manhattan Gastroenterology",
-            "url": "https://www.manhattangastroenterology.com/patient-info/insurance-plans/",
-            "description": "Gastroenterology insurance plans accepted at Manhattan Gastroenterology include Aetna, Cigna, UHC, and more. Learn about billing and ..."
-          },
-          {
-            "title": "Accepted Insurances | New York Gastroenterology Associates",
-            "url": "https://www.nygahealth.com/accepted-insurances/",
-            "description": "Accepted Insurances · 1199 · Aetna · Affinity · Anthem Blue Cross Blue Shield · Cigna · Fidelis · Emblem Health - HIP · Empire NY Government Plan ..."
-          },
-          {
-            "title": "Manhattan Gastroenterology (New York) - Book Appointment Online!",
-            "url": "https://www.zocdoc.com/practice/manhattan-gastroenterology-3131",
-            "description": "Insurances accepted. 99% of patients have successfully booked with these insurances. Aetna. BlueCross BlueShield. Cigna. Emblem Health. UnitedHealthcare. (200+ ..."
-          },
-          {
-            "title": "Billing & Insurance | Medical Offices of Manhattan",
-            "url": "https://www.medicalofficesofmanhattan.com/billing-insurance/",
-            "description": "We accept the following health insurances: 1199; Aetna; Alliance (PPO); Beech Street; Cigna; Emblem; Empire Blue Cross Blue Shield; Freelancers; GHI ..."
-          },
-          {
-            "title": "Practice Information - Manhattan Gastroenterology",
-            "url": "https://www.manhattangastroenterology.com/practice-information/",
-            "description": "Book Online Most Commercial Insurances Accepted ... Notice of Health Care Plan Participation, Hospital Affiliations, and Coordination of Care/ ..."
-          }
-        ],
-        "patient_rating": [
-          {
-            "title": "MANHATTAN GASTROENTEROLOGY - Updated March 2026 - Yelp",
-            "url": "https://www.yelp.com/biz/manhattan-gastroenterology-new-york-20",
-            "description": "“Lee was very attentive and catered my treatment to specially to my needs and gave me great dietary pointers.” Mentioned in 9 reviews. Read more highlights. You ..."
-          },
-          {
-            "title": "Manhattan Gastroenterology | New York, NY - SureCritic",
-            "url": "https://www.surecritic.com/reviews/manhattan-gastroenterology",
-            "description": "8 reviews for Manhattan Gastroenterology. On 02/02/2024, Lily F. wrote 'Amazing doctor! Dr. Khodadadian is very pleasant going the extra mile to hel...'"
-          },
-          {
-            "title": "MANHATTAN GASTROENTEROLOGY - Updated March 2026 - Yelp",
-            "url": "https://www.yelp.com/biz/manhattan-gastroenterology-new-york-24",
-            "description": "I've had 7 prior scopes elsewhere and this was the worst experience and perhaps the only bad one. While under anesthesia, I aspirated stomach acid into my lungs ..."
-          },
-          {
-            "title": "Manhattan Gastroenterology Reviews - Shopper Approved",
-            "url": "https://www.shopperapproved.com/reviews/ManhattanGastroenterology.com/",
-            "description": "Overall Ratings. Manhattan Gastroenterology has an overall customer rating of 5.0 out of 5 stars from 1,521 reviews indicating that most customers are generally ..."
-          },
-          {
-            "title": "Best Gastroenterologists NYC - Top-Rated GI Doctors in New York City",
-            "url": "https://www.manhattangastroenterology.com/best-rated-nyc-gastroenterologists-top-nyc-gi-doctors/",
-            "description": "Our New York gastroenterologists are highly accomplished physicians consistently rated as the top doctors in New York by Castle Connolly Regional Top Doctors."
-          }
-        ]
-      }
-    },
-    {
-      "id": "265875652",
-      "name": "Manhattan Restorative Health Sciences",
-      "address": "295 Madison Avenue, New York, NY",
-      "phone": "N/A",
-      "lat": 40.7516073,
-      "lng": -73.979708,
-      "distance_miles": 0.2,
-      "rating": null,
-      "specialties": [
-        "General"
-      ],
-      "er_wait_minutes": null,
-      "insurance_accepted": [],
-      "hours": "Call ahead",
-      "website": "https://www.mrhsclinics.com/",
-      "web_details": {
-        "specialties_services": [
-          {
-            "title": "Manhattan Restorative Health Sciences | Pain Management NYC ...",
-            "url": "https://www.mrhsclinics.com/",
-            "description": "At MRHS, our team of world-class, award-winning physicians, led by Dr. Tim Canty, specialize in pain management in NYC. Call 917-997-8389 to book an ..."
-          },
-          {
-            "title": "Specialized Cancer Pain Relief in New York City | MRHS",
-            "url": "https://www.mrhsclinics.com/types-of-pain-we-treat/specialized-cancer-pain-relief-in-new-york-city",
-            "description": "At Manhattan Restorative Health Sciences in New York City, we offer innovative, non-surgical solutions tailored to address cancer pain effectively."
-          },
-          {
-            "title": "Approach | Manhattan Restorative Health Sciences | New York",
-            "url": "https://www.mrhsclinics.com/approach",
-            "description": "Our advanced approach combines a range of Pain Management, Interventional Treatments, Regenerative Medicine, and Integrative Wellness Therapies."
-          },
-          {
-            "title": "Back Pain Treatment in New York City | MRHS - Dr Tim Canty",
-            "url": "https://www.mrhsclinics.com/types-of-pain-we-treat/back-pain-treatment-in-new-york-city",
-            "description": "At Manhattan Restorative Health Sciences, we provide a range of non-surgical treatments designed to relieve back pain, restore function, and prevent recurrence."
-          },
-          {
-            "title": "Manhattan Pain Management Specialists | MRHS",
-            "url": "https://www.mrhsclinics.com/manhattan-pain-management-specialist",
-            "description": "Our team of Manhattan pain management specialists and physicians delivers customized treatments and compassionate support to help patients avoid surgery."
-          }
-        ],
-        "insurance_accepted": [
-          {
-            "title": "Insurance & Payment Options | MR Primary Care | New York City",
-            "url": "https://www.mrhsclinics.com/primary-care/insurance",
-            "description": "View our accepted plans, including Aetna, Cigna, and Medicare. We offer transparent pricing for all NYC patients. Questions? Call 917-722-4491."
-          },
-          {
-            "title": "Patients | Manhattan Restorative Health Sciences | New York",
-            "url": "https://www.mrhsclinics.com/patients",
-            "description": "We take most insurances including all private insurances (in and out of network), medicare, workers compensation, no fault accidents, and some medicaid plans."
-          },
-          {
-            "title": "Home | MRHS - Manhattan Restorative Health Sciences",
-            "url": "https://www.mrhsclinics.com/tms",
-            "description": "... plans for our patients, and to advance impactful medical research for all ... Covered by Insurance. We handle the paperwork so you can focus on you ..."
-          },
-          {
-            "title": "Manhattan Restorative Health Sciences | Pain Management NYC ...",
-            "url": "https://www.mrhsclinics.com/",
-            "description": "Accepting New Patients · Urgent Care Center in NYC · Insurance · Annual Physicals · Anxiety Treatment · Blood Tests · Medical Weight Loss · Prescription Refills."
-          },
-          {
-            "title": "Accepting New Patients | MR Primary Care | New York City",
-            "url": "https://www.mrhsclinics.com/primary-care/accepting-new-patients",
-            "description": "We accept most major PPO and commercial insurance plans ... MANHATTAN RESTORATIVE WELLNESS are trademarks of Manhattan Restorative Health Sciences Inc."
-          }
-        ],
-        "patient_rating": [
-          {
-            "title": "MANHATTAN RESTORATIVE HEALTH SCIENCES - Phone Number",
-            "url": "https://www.yelp.com/biz/manhattan-restorative-health-sciences-new-hyde-park",
-            "description": "(2 reviews). Pro health abandoned me as a patient of theirs after over a decade. After having a successful…read moreprotocol implemented for over a decade ..."
-          },
-          {
-            "title": "Read Customer Service Reviews of www.mrhsclinics.com",
-            "url": "https://www.trustpilot.com/review/www.mrhsclinics.com",
-            "description": "Health & Medical · Clinics · Medical Clinic; Mrhsclinics. Summary About ... Average. TrustScore 3 out of 5. 1 review. 5-star. 4-star. 3-star. 2 ..."
-          },
-          {
-            "title": "Manhattan Restorative Health Sciences - 15 Reviews",
-            "url": "https://reviews.birdeye.com/manhattan-restorative-health-sciences-166581236849126",
-            "description": "How is Manhattan Restorative Health Sciences rated? Manhattan Restorative Health Sciences has a 4.5 star rating with 15 reviews. When is Manhattan Restorative ..."
-          },
-          {
-            "title": "Manhattan Restorative Health Sciences Reviews (8) - Glassdoor",
-            "url": "https://www.glassdoor.com/Reviews/Manhattan-Restorative-Health-Sciences-Reviews-E5040385.htm",
-            "description": "Upper management not clear on expectations. New hires make more than current staff. Helpful. Share. 1.0. Sep 9, 2022. toxic environment."
-          },
-          {
-            "title": "Patients | Manhattan Restorative Health Sciences | New York",
-            "url": "https://www.mrhsclinics.com/patients",
-            "description": "patients, and to advance impactful medical research for all ... Over 600 5-star reviews. LOCATIONS · Manhattan-clinics · Manhattan · Midtown · Bronx."
-          }
-        ]
-      }
-    },
-    {
-      "id": "1581175993",
-      "name": "NYU Langone Outpatient Surgery Center",
-      "address": "339 East 38th Street, New York",
-      "phone": "+1 212 263 1515",
-      "lat": 40.7464784,
-      "lng": -73.9717941,
-      "distance_miles": 0.7,
-      "rating": null,
-      "specialties": [
-        "Surgery"
-      ],
-      "er_wait_minutes": null,
-      "insurance_accepted": [],
-      "hours": "Call ahead",
-      "website": "https://nyulangone.org/locations/nyu-langone-outpatient-surgery-center",
-      "web_details": {
-        "specialties_services": [
-          {
-            "title": "Day Surgery Center | NYU Langone Health",
-            "url": "https://nyulangone.org/locations/day-surgery-center",
-            "description": "Outpatient Surgical Procedures ... At the Day Surgery Center, we meet the growing demand for advanced reconstructive and microsurgical procedures, including ..."
-          },
-          {
-            "title": "Department of Surgery Clinical Services | NYU Langone Health",
-            "url": "https://med.nyu.edu/departments-institutes/surgery/clinical-services",
-            "description": "Surgeons in NYU Langone's Department of Surgery collaborate across multiple specialties to provide a wide range of surgical services."
-          },
-          {
-            "title": "Surgical Services at NYU Langone Hospital—Brooklyn",
-            "url": "https://nyulangone.org/locations/nyu-langone-hospital-brooklyn/surgical-services-at-nyu-langone-hospital-brooklyn",
-            "description": "We provide all levels of surgical care, including acute treatment after a life-threatening accident through our Level 1 Trauma Center, cancer treatment."
-          },
-          {
-            "title": "NYU Langone Outpatient Surgery Center Doctors",
-            "url": "https://nyulangone.org/locations/nyu-langone-outpatient-surgery-center/doctors",
-            "description": "Young W. Kwon, MD, PhD Shoulder & Elbow Surgery, Orthopedics Treats Adults NYU Langone Orthopedic Center 333 East 38th Street, 4th Floor New York, NY 10016"
-          },
-          {
-            "title": "Preparing for Outpatient Orthopedic Surgery | NYU Langone Health",
-            "url": "https://nyulangone.org/locations/nyu-langone-outpatient-surgery-center/preparing-for-outpatient-orthopedic-surgery",
-            "description": "Learn how to prepare for your procedure at the NYU Langone Outpatient Surgery Center, and find out what to expect afterward. Learn more."
-          }
-        ],
-        "insurance_accepted": [
-          {
-            "title": "Insurance Options | NYU Langone Health",
-            "url": "https://nyulangone.org/locations/insurance-options",
-            "description": "We accept insurance plans from the following companies: Aetna; First Health; Blue Cross Blue Shield; Cigna; MVP Health Care; GHI; Connecticare; HIP; Medicare ..."
-          },
-          {
-            "title": "Accepted Insurance Plans for Urgent Care at NYU Langone",
-            "url": "https://nyulangone.org/care-services/urgent-care/accepted-insurance-plans-for-urgent-care-at-nyu-langone",
-            "description": "Accepted Insurance Plans for Urgent Care at NYU Langone · A. Aetna. Aetna HMO; Aetna Indemnity · B Blue Cross Blue Shield. BCBS EPO; BCBS Federal Program · C ..."
-          },
-          {
-            "title": "Care on Demand Insurance Options | NYU Langone Health",
-            "url": "https://nyulangone.org/care-services/care-on-demand/care-on-demand-insurance-options",
-            "description": "Accepted Insurance Plans · A. Aetna. Aetna HMO; Aetna Indemnity; Aetna Medicare Advantage · B Blue Cross Blue Shield. BCBS EPO; BCBS Federal Program; BCBS HMO · C ..."
-          },
-          {
-            "title": "[PDF] NYU Langone participating plan grid",
-            "url": "https://nyulangone.org/files/nyu-langone-participating-plan-grid.pdf",
-            "description": "NYU Hospitals are out of network with. Medicare VIP Reserve Network & GHI Network Access and EmblemHealth Millennium Network. Health First. All ..."
-          },
-          {
-            "title": "Insurance, Billing & Financial Assistance | NYU Langone Health",
-            "url": "https://nyulangone.org/insurance-billing-financial-assistance",
-            "description": "If you do not have health insurance, please call us at 800-237-6977 to get information about an out-of-pocket cost estimate, or to learn more about our ..."
-          }
-        ],
-        "patient_rating": [
-          {
-            "title": "NYU Langone Hospital—Long Island | Ratings | Leapfrog Group",
-            "url": "https://ratings.leapfroggroup.org/facility/details/33-0167/nyu-langone-hospital-long-island-mineola-ny",
-            "description": "Performance on the following four domains of the Outpatient and Ambulatory Surgery (OAS) CAHPS Survey make up a hospital's score on Leapfrog's “ ..."
-          },
-          {
-            "title": "NYU Langone Hospitals in New York, NY - Rankings & Ratings",
-            "url": "https://health.usnews.com/best-hospitals/area/ny/nyu-langone-medical-center-6212925",
-            "description": "89% of patients at NYU Langone Hospitals are willing to recommend this hospital to others. It is a teaching hospital. It is a general medical and surgical ..."
-          },
-          {
-            "title": "NYU Langone Hospitals - Medicare",
-            "url": "https://www.medicare.gov/care-compare/details/hospital/330214/view-all?state=NY",
-            "description": "Patient survey rating. The patient survey rating measures patients' experiences of their care. Recent patients were asked about important topics ..."
-          },
-          {
-            "title": "NYU LANGONE OUTPATIENT SURGERY CENTER - Phone Number",
-            "url": "https://www.yelp.com/biz/nyu-langone-outpatient-surgery-center-new-york",
-            "description": "NYU Langone Outpatient has been very cooperative with me during my preparation for chemotherapy. They accommodated my need for an immediate appointment for ..."
-          },
-          {
-            "title": "NYU Langone Medical Center Reviews 11 - Trustpilot",
-            "url": "https://www.trustpilot.com/review/nyulangone.org",
-            "description": "11 people have already reviewed NYU Langone Medical Center. Read about their experiences and share your own!"
-          }
-        ]
-      }
-    },
-    {
-      "id": "2717876703",
-      "name": "MRHS Primary Care",
-      "address": "139 East 57th Street",
-      "phone": "N/A",
-      "lat": 40.7609528,
-      "lng": -73.9687909,
+      "id": "ChIJdUrffUJZwokRwuMqrnBmhUo",
+      "name": "NYU Langone Health",
+      "address": "550 1st Ave, New York, NY 10016, USA",
+      "phone": "(646) 929-7800",
+      "lat": 40.7421225,
+      "lng": -73.9739642,
       "distance_miles": 0.9,
-      "rating": null,
-      "specialties": [
-        "Emergency Medicine"
-      ],
+      "rating": 3.7,
+      "user_ratings_total": 510,
       "er_wait_minutes": null,
       "insurance_accepted": [],
-      "hours": "Call ahead",
-      "website": "https://www.mrhsclinics.com/",
+      "hours": "Monday: Open 24 hours; Tuesday: Open 24 hours; Wednesday: Open 24 hours; Thursday: Open 24 hours; Friday: Open 24 hours; Saturday: Open 24 hours; Sunday: Open 24 hours",
+      "website": "https://nyulangone.org/doctors?cid=osc_fb_page_about",
+      "google_maps_url": "https://maps.google.com/?cid=5369810764853601218&g_mp=Cilnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaE5lYXJieRACGAQgAA",
       "web_details": {
         "specialties_services": [
           {
-            "title": "How Do I Find a Primary Care Physician? | New York City",
-            "url": "https://www.mrhsclinics.com/primary-care/how-do-i-find-a-primary-care-physician",
-            "description": "Why Patients Choose MRHS Primary Care. MRHS Primary Care focuses on adult primary care with an emphasis on communication, access, and continuity. Our ..."
-          },
-          {
-            "title": "MR Primary Care | Formerly Lexington Medical Associates | NYC",
-            "url": "https://www.mrhsclinics.com/primary-care-new-york",
-            "description": "Get expert primary care in New York City with MR Primary Care! Comprehensive, patient-focused care for your long-term health needs. Call 917-722-4491 today."
-          },
-          {
-            "title": "Primary Care | St. Louis (The Boulevard) - SSM Health",
-            "url": "https://www.getcare.ssmhealth.com/locations/location-details/medical-group-st-louis-boulevard-primary-care",
-            "description": "Online Health Care that Fits Your Life. Open Everyday: 6:00 AM to 10:00 PM. Offering two affordable options. Choose the most convenient for you."
-          },
-          {
-            "title": "Health Care Services | St. Louis - St. Luke's Hospital",
-            "url": "https://www.stlukes-stl.com/services",
-            "description": "St. Luke's Hospital Services, a 493-bed not-for-profit hospital, offers more than 60 specialty areas including cardiovascular care and surgery, cancer care, ..."
-          },
-          {
-            "title": "MountainStar Medical Group: Cardiology, OB/GYN, Primary Care ...",
-            "url": "https://www.mountainstarmedicalgroup.com/",
-            "description": "MountainStar Medical Group offers family medicine, OBGYN, Internal Medicine and specialty care in Utah. Schedule an appointment online."
-          }
-        ],
-        "insurance_accepted": [
-          {
-            "title": "Health Insurance Plans | MemorialCare",
-            "url": "https://www.memorialcare.org/patients-visitors/health-insurance-plans",
-            "description": "MemorialCare Medical Group accepts most major HMO, PPO, and EPO, health plans, as well as Medicare, private indemnity and supplemental insurance plans."
-          },
-          {
-            "title": "Insurance & Payment Options | MR Primary Care | New York City",
-            "url": "https://www.mrhsclinics.com/primary-care/insurance",
-            "description": "View our accepted plans, including Aetna, Cigna, and Medicare. We offer transparent pricing for all NYC patients. Questions? Call 917-722-4491."
-          },
-          {
-            "title": "Primary Care - Doctors & Physicians - MemorialCare",
-            "url": "https://www.memorialcare.org/services/primary-care",
-            "description": "MemorialCare accepts most major HMO, PPO and EPO health plans, as well as Medicare, private indemnity and supplemental insurance plans. Visit your health ..."
-          },
-          {
-            "title": "Health Plans Accepted | Huntington Hospital",
-            "url": "https://www.huntingtonhealth.org/patients/cost-of-care/accepted-health-plans/",
-            "description": "Huntington Hospital is pleased to accept your HMO, Point-of-Service, PPO or EPO health coverage through the following plans."
-          },
-          {
-            "title": "[PDF] Provider Directory 2025 - UnitedHealthcare",
-            "url": "https://www.uhc.com/medicare/alphadog/CSWY25LP0252141_002",
-            "description": "This directory provides a list of your plan's network providers. This directory is for the and service area listed on the cover."
-          }
-        ],
-        "patient_rating": [
-          {
-            "title": "How Do I Find a Primary Care Physician? | New York City",
-            "url": "https://www.mrhsclinics.com/primary-care/how-do-i-find-a-primary-care-physician",
-            "description": "Why Patients Choose MRHS Primary Care. MRHS Primary Care focuses on adult primary care with an emphasis on communication, access, and continuity. Our ..."
-          },
-          {
-            "title": "MIDWEST REGIONAL HEALTH SERVICES - Updated March 2026",
-            "url": "https://www.yelp.com/biz/midwest-regional-health-services-omaha-3",
-            "description": "Unbelievable care from unbelievable providers! The best clinic experience I've had in a lifetime."
-          },
-          {
-            "title": "Midwest Regional Health Services | Primary Care & Family Medicine ...",
-            "url": "https://www.mrhsomaha.com/",
-            "description": "... patients and their families, rooted in trust, compassion, and personalized care. Read More. Patients Reviews. 4.89 / 5 rating with over 500 reviews! View All ..."
-          },
-          {
-            "title": "Best Internal Medicine Doctors Near Me | MR Primary Care",
-            "url": "https://www.mrhsclinics.com/primary-care/best-internal-medicine-doctors-near-me",
-            "description": "Top-rated internal medicine in Midtown. Our physicians provide expert care for chronic and acute conditions. Call 917-722-4491 to schedule your visit."
-          },
-          {
-            "title": "HCA HealthONE Mountain Ridge | Thornton CO - Facebook",
-            "url": "https://www.facebook.com/HCAHealthONEMountainRidge/",
-            "description": "HCA HealthONE Mountain Ridge is honored to earn a Healthgrades five-star rating for our hip fracture care. Why it matters: a 51% lower risk of experiencing a ..."
-          }
-        ]
-      }
-    },
-    {
-      "id": "150368085",
-      "name": "NYU Langone Medical Center",
-      "address": "New York",
-      "phone": "+1 646 929 7870",
-      "lat": 40.7420343,
-      "lng": -73.9736761,
-      "distance_miles": 0.9,
-      "rating": null,
-      "specialties": [
-        "Emergency Medicine"
-      ],
-      "er_wait_minutes": null,
-      "insurance_accepted": [],
-      "hours": "24/7",
-      "website": "https://med.nyu.edu/",
-      "web_details": {
-        "specialties_services": [
-          {
-            "title": "Care & Services | NYU Langone Health",
+            "title": "Care & Services",
             "url": "https://nyulangone.org/care-services",
-            "description": "Family Travel Medicine Center at NYU Langone Hospital—Long Island Learn About This Specialty · Female Pelvic Medicine and Reconstructive Surgery · Fertility ..."
+            "description": "Featured Care and Services. Whether you need a routine checkup or heart valve replacement, our doctors help you reach and maintain your optimal health, ..."
           },
           {
             "title": "Patient Care at NYU Langone Health",
@@ -429,19 +28,19 @@
             "description": "NYU Langone Health is one of the nation's top integrated academic health systems devoted to patient care, education, and research. Learn more."
           },
           {
-            "title": "Medical & Surgical Specialties at Tisch Hospital - NYU Langone",
+            "title": "Departments & Institutes | NYU Langone Health",
+            "url": "https://med.nyu.edu/departments-institutes",
+            "description": "Hospital Medicine · Infectious Diseases and Immunology · Medical Humanities · Nephrology · Precision Medicine · Pulmonary, Critical Care, and Sleep Medicine."
+          },
+          {
+            "title": "Medical & Surgical Specialties at Tisch Hospital",
             "url": "https://nyulangone.org/locations/tisch-hospital/medical-surgical-specialties-at-tisch-hospital",
-            "description": "Medical & Surgical Specialties at Tisch Hospital · cardiology, including the care of heart and vascular conditions · dermatology, including skin and cosmetic ..."
+            "description": "hematology, including cancers, tumors, and blood disorders · infectious diseases; neurology and neurosurgery, including brain and nervous system disorders ..."
           },
           {
-            "title": "Department of Medicine Clinical Services | NYU Langone Health",
-            "url": "https://med.nyu.edu/departments-institutes/medicine/clinical-services",
-            "description": "Physicians in NYU Langone's Department of Medicine collaborate across multiple specialties to provide a wide range of clinical services."
-          },
-          {
-            "title": "NYU Langone Hospital—Long Island",
-            "url": "https://nyulangone.org/locations/nyu-langone-hospital-long-island",
-            "description": "We offer care in nearly every specialty and subspecialty of medicine and surgery, and are recognized leaders in treatment for heart disease, cancer, and ..."
+            "title": "Specialties & Services at NYU Langone Astoria Medical ...",
+            "url": "https://nyulangone.org/locations/nyu-langone-astoria-medical-associates/specialties-services-at-nyu-langone-astoria-medical-associates",
+            "description": "Cardiology Services · Endocrinology and Rheumatology Care · Gastroenterology Services · Gynecologic and Obstetric Care · Neurosurgery Services · Orthopedic Surgery ..."
           }
         ],
         "insurance_accepted": [
@@ -458,24 +57,24 @@
           {
             "title": "[PDF] NYU Langone participating plan grid",
             "url": "https://nyulangone.org/files/nyu-langone-participating-plan-grid.pdf",
-            "description": "NYU Hospitals are out of network with. Medicare VIP Reserve Network & GHI Network Access and EmblemHealth Millennium Network. Health First. All ..."
+            "description": "NYU Hospitals are out of network with Exchange/Medicare/Medicaid Networks. Behavioral Health Carve Out Plan. United Healthcare. HMO, POS-P, POS, ..."
           },
           {
             "title": "[PDF] We accept the following insurances - NYU Langone",
             "url": "https://nyulangone.org/files/NYUSDC-JAN2014-Insurance-List.pdf",
-            "description": "The Empire Plan (NYSHIP). Oxford Freedom & Medicare (not Liberty) some plans may require specialist referrals. Cigna. Metro Plus."
+            "description": "We accept the following insurances: Aetna All plans (some plans require ... HIP (not Medicaid, Family Health Plus, or the Health exchange plans) most plans."
           },
           {
-            "title": "Insurance, Billing & Financial Assistance | NYU Langone Health",
-            "url": "https://nyulangone.org/insurance-billing-financial-assistance",
-            "description": "NYU Langone participates in many health plan networks. Each health plan creates a network of doctors and hospitals who have agreed to be in that network. It's ..."
+            "title": "Accepted Insurance Plans for Primary Care & Specialty Services in ...",
+            "url": "https://nyulangone.org/locations/primary-care-specialty-services-in-florida/accepted-insurance-plans-for-primary-care-specialty-services-in-florida",
+            "description": "Aetna; Blue Cross Blue Shield; Cigna; Connecticare; First Health; GHI; HIP; Medicare; Multiplan; MVP Health Care; NYSHIP - The Empire Plan ..."
           }
         ],
         "patient_rating": [
           {
             "title": "NYU Langone Health - Hospitals - Yelp",
             "url": "https://www.yelp.com/biz/nyu-langone-health-new-york-3",
-            "description": "Manhattan Lasik Center - New York. 4.5 (659 reviews). Ria B. said: So I have waited anxiously for a long time to write my review. ... reviews.… read more. About."
+            "description": "Manhattan Lasik Center - New York. 4.5 (659 reviews). Ria B. said: So I have waited anxiously for a long time to write my review. I had my… read more · Aquamom."
           },
           {
             "title": "NYU Langone Health Continues to Earn Straight 'A's for Patient Safety",
@@ -483,19 +82,415 @@
             "description": "NYU Langone has earned a five-star rating for safety, quality, and patient experience from the Centers for Medicare and Medicaid Services (CMS)"
           },
           {
+            "title": "NYU Langone Hospitals in New York, NY - Rankings & Ratings",
+            "url": "https://health.usnews.com/best-hospitals/area/ny/nyu-langone-medical-center-6212925",
+            "description": "NYU Langone Hospitals has an excellent cardiology patient survival rating. NYU Langone Hospitals is rated excellent in its ability to discharge patients home ..."
+          },
+          {
+            "title": "NYU LANGONE HOSPITAL - Updated March 2026 - Yelp",
+            "url": "https://www.yelp.com/biz/nyu-langone-hospital-mineola",
+            "description": "This hospital employs kind, caring medical professionals who genuinely seem like they enjoy their work. It doesn't go unnoticed."
+          },
+          {
             "title": "NYU Langone Medical Center Reviews 11 - Trustpilot",
             "url": "https://www.trustpilot.com/review/nyulangone.org",
             "description": "11 people have already reviewed NYU Langone Medical Center. Read about their experiences and share your own!"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ChIJzQtHCQ9ZwokRt0QutuNH8Yg",
+      "name": "Tisch Hospital",
+      "address": "550 1st Ave, New York, NY 10016, USA",
+      "phone": "(646) 929-7870",
+      "lat": 40.742193,
+      "lng": -73.9739553,
+      "distance_miles": 0.9,
+      "rating": 4,
+      "user_ratings_total": 365,
+      "er_wait_minutes": null,
+      "insurance_accepted": [],
+      "hours": "Call ahead",
+      "website": "http://nyulangone.org/locations/tisch-hospital?cid=syn_yext&y_entity_id=1105&y_source=1_MTU5MjA1ODQtNzE1LWxvY2F0aW9uLndlYnNpdGU%3D",
+      "google_maps_url": "https://maps.google.com/?cid=9867747301885101239&g_mp=Cilnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaE5lYXJieRACGAQgAA",
+      "web_details": {
+        "specialties_services": [
+          {
+            "title": "Tisch Hospital | NYU Langone Health",
+            "url": "https://nyulangone.org/locations/tisch-hospital",
+            "description": "Tisch Hospital · Medical & Surgical Specialties · For New & Expecting Parents · Nursing · In-Room Services · Dining Options · Gift Shop. We can help you find a ..."
+          },
+          {
+            "title": "NYU Langone Health - Tisch Hospital - New York, NY",
+            "url": "https://www.castleconnolly.com/top-hospitals/nyu-langone-health-tisch-hospital-nyc0110",
+            "description": "NYU Langone Health - Tisch Hospital · Cancer Surgery · General Surgery · Heart & Vascular Surgery · Orthopaedic Surgery · Urologic Surgery."
+          },
+          {
+            "title": "Departments & Institutes | NYU Langone Health",
+            "url": "https://med.nyu.edu/departments-institutes",
+            "description": "Hospital Medicine · Infectious Diseases and Immunology · Medical Humanities · Nephrology · Precision Medicine · Pulmonary, Critical Care, and Sleep Medicine."
+          },
+          {
+            "title": "Provider Report for NYC Langone Tisch Hospital - Turquoise Health",
+            "url": "https://turquoise.health/providers/nyu-langone-tisch-hospital",
+            "description": "All Services · Acute Renal Dialysis · Adult Inpatient Psychiatric Care · Anesthesia · Audiology · Cardiac Catheterization Lab · Cardiac Thoracic Surgery · CARF ..."
+          },
+          {
+            "title": "NYU Langone Hospitals - NYS Health Profiles",
+            "url": "https://profiles.health.ny.gov/hospital/printview/103021",
+            "description": "Services: Medical Services - Other Medical Specialties; Medical Services - Primary Care; Therapy - Occupational O/P; Therapy - Physical O/P. NYU Langone ..."
+          }
+        ],
+        "insurance_accepted": [
+          {
+            "title": "Accepted Insurance Plans for Urgent Care at NYU Langone",
+            "url": "https://nyulangone.org/care-services/urgent-care/accepted-insurance-plans-for-urgent-care-at-nyu-langone",
+            "description": "Accepted Insurance Plans for Urgent Care at NYU Langone · A. Aetna. Aetna HMO; Aetna Indemnity · B Blue Cross Blue Shield. BCBS EPO; BCBS Federal Program · C ..."
+          },
+          {
+            "title": "[PDF] NYU Langone participating plan grid",
+            "url": "https://nyulangone.org/files/nyu-langone-participating-plan-grid.pdf",
+            "description": "plans, NYU Tisch/Orthopedic hospitals are participating with CBH NYU students only. Suffolk is participating with Evernorth formerly Cigna ..."
+          },
+          {
+            "title": "Insurance Options | NYU Langone Health",
+            "url": "https://nyulangone.org/locations/insurance-options",
+            "description": "We accept insurance plans from the following companies: Aetna; First Health; Blue Cross Blue Shield; Cigna; MVP Health Care; GHI; Connecticare; HIP; Medicare ..."
+          },
+          {
+            "title": "Health Insurance Plans that Mount Sinai & NYU Langone Accept",
+            "url": "https://life143.com/health-insurance-plans-that-mount-sinai-nyu-langone-accept/",
+            "description": "Here are some of the health insurance plans that both Mount Sinai and NYU Langone accept: · Aetna · Blue Cross and Blue Shield · Cigna · Gallagher ..."
+          },
+          {
+            "title": "Hospital Participation | NY State of Health",
+            "url": "https://info.nystateofhealth.ny.gov/hospital-participation",
+            "description": "This tool is designed to help you find participating hospitals in an insurer's network in the Essential Plan and Qualified Health Plan programs."
+          }
+        ],
+        "patient_rating": [
+          {
+            "title": "NYU Langone Hospitals Earn 11th Consecutive Top Safety Rating ...",
+            "url": "https://nyulangone.org/news/nyu-langone-hospitals-earn-11th-consecutive-top-safety-rating-independent-healthcare-watchdog",
+            "description": "The “A” rating applies to Tisch Hospital and Kimmel Pavilion in Manhattan, NYU Langone Hospital—Brooklyn and NYU Langone Hospital—Long ..."
+          },
+          {
+            "title": "NYU Langone hospitals received an “A” grade in patient safety from ...",
+            "url": "https://www.facebook.com/NYULangone/posts/nyu-langone-hospitals-received-an-a-grade-in-patient-safety-from-the-leapfrog-gr/1255449473279778/",
+            "description": "The “A” rating applies to our Tisch Hospital ... Highland Hospital is Rochester's top rated hospital with an A rating in terms of patient safety."
+          },
+          {
+            "title": "NYU Langone Hospital—Long Island | Ratings | Leapfrog Group",
+            "url": "https://ratings.leapfroggroup.org/facility/details/33-0167/nyu-langone-hospital-long-island-mineola-ny",
+            "description": "The Leapfrog Group ratings for NYU Langone Hospital—Long Island."
+          },
+          {
+            "title": "NYU LANGONE HOSPITAL - Updated March 2026 - Yelp",
+            "url": "https://www.yelp.com/biz/nyu-langone-hospital-mineola",
+            "description": "This hospital employs kind, caring medical professionals who genuinely seem like they enjoy their work. It doesn't go unnoticed."
           },
           {
             "title": "NYU Langone Hospitals in New York, NY - Rankings & Ratings",
             "url": "https://health.usnews.com/best-hospitals/area/ny/nyu-langone-medical-center-6212925",
             "description": "89% of patients at NYU Langone Hospitals are willing to recommend this hospital to others. It is a teaching hospital. It is a general medical and surgical ..."
+          }
+        ]
+      }
+    },
+    {
+      "id": "ChIJqccvIQxZwokR4PfF_NqTomc",
+      "name": "NYC Health + Hospitals / Bellevue",
+      "address": "462 1st Ave, New York, NY 10016, USA",
+      "phone": "(212) 562-4141",
+      "lat": 40.7396865,
+      "lng": -73.9762044,
+      "distance_miles": 1.0,
+      "rating": 4.3,
+      "user_ratings_total": 4929,
+      "er_wait_minutes": null,
+      "insurance_accepted": [],
+      "hours": "Monday: Open 24 hours; Tuesday: Open 24 hours; Wednesday: Open 24 hours; Thursday: Open 24 hours; Friday: Open 24 hours; Saturday: Open 24 hours; Sunday: Open 24 hours",
+      "website": "http://www.nychealthandhospitals.org/bellevue/",
+      "google_maps_url": "https://maps.google.com/?cid=7467693700886689760&g_mp=Cilnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaE5lYXJieRACGAQgAA",
+      "web_details": {
+        "specialties_services": [
+          {
+            "title": "NYC Health + Hospitals/Bellevue",
+            "url": "https://www.nychealthandhospitals.org/locations/bellevue/",
+            "description": "Stroke Center · Behavioral Health Services · Emergency Services · Heart Health · Ambulatory Care · Same Day Surgery Service."
           },
           {
-            "title": "NYU Langone Hospital - Brooklyn - Leapfrog Ratings",
-            "url": "https://ratings.leapfroggroup.org/facility/details/33-0306/nyu-langone-hospital---brooklyn-brooklyn-ny",
-            "description": "Patients' overall rating of the facility, 81%. Patients willingness ... hospital, ambulatory surgery center, or other health care provider."
+            "title": "Surgery & Surgical Specialty - NYC Health + Hospitals",
+            "url": "https://www.nychealthandhospitals.org/bellevue/services/surgery-surgical-specialty/",
+            "description": "Surgery & Surgical Specialty · Adult Services · Bariatric Surgery & Weight Management · Behavioral Health · Cancer Center · Centers of Excellence · Children's Health ..."
+          },
+          {
+            "title": "Centers of Excellence - NYC Health + Hospitals",
+            "url": "https://nychealthandhospitals-appservice-east-us.azurewebsites.net/bellevue/services/centers-of-excellence/",
+            "description": "NYC Health + Hospitals/Bellevue offers high-quality cancer services, including screening, diagnosis, and treatment for breast, cervical, colorectal, and other ..."
+          },
+          {
+            "title": "Bellevue Surgery & Surgical Specialty - NYC Health + Hospitals",
+            "url": "https://www.nychealthandhospitals.org/bellevue/bellevue-surgery-surgical-specialty/",
+            "description": "Bellevue Surgery & Surgical Specialty · Advanced GI Foregut Surgery · Breast Surgery · Cancer Surgery (Surgical Oncology) · Colon & Rectal Surgery · Endocrine ..."
+          },
+          {
+            "title": "Adult Services - NYC Health + Hospitals",
+            "url": "https://www.nychealthandhospitals.org/bellevue/services/adult-services/",
+            "description": "Sub-specialty Care. Allergy; Cardiac. General; Congestive Heart Failure (CHF); Pacemaker. Dermatology; Ear, Nose and Throat. Hearing ..."
+          }
+        ],
+        "insurance_accepted": [
+          {
+            "title": "Insurance Search - NYC Health + Hospitals",
+            "url": "https://www.nychealthandhospitals.org/insurance/",
+            "description": "Insurance Search · 1199 SEIU · Administrative Services Only (ASO) (MetroDent Select PPO Network) (Dental Services) · Aetna · Affinity by Molina Healthcare."
+          },
+          {
+            "title": "[PDF] NYC Health + Hospitals / Bellevue",
+            "url": "https://www.nychealthandhospitals.org/wp-content/uploads/2017/01/contracted-plans-bellevue.pdf",
+            "description": "Commercial: HMO, Indemnity, POS, PPO. Freedom Plan PPO. Liberty PlanSM Gated EPO. Liberty PlanSM Gated PPO. Liberty PlanSM PPO. LibertySM HMO. Oxford EPO."
+          },
+          {
+            "title": "Insurance Search - NYC Health + Hospitals - Page 2 of 5",
+            "url": "https://www.nychealthandhospitals.org/insurance/page/2/",
+            "description": "NYC Health + Hospital's providers and hospitals are contracted with the health plans listed in this website, which means that they are in-network and ..."
+          },
+          {
+            "title": "NYC Health + Hospitals/Bellevue",
+            "url": "https://www.nychealthandhospitals.org/locations/bellevue/",
+            "description": "Insurance SearchFinancial AssistanceYour Healthcare CostsPaying For Your Health Care ... NYC Health + Hospitals/Bellevue is the oldest hospital in America. We ..."
+          },
+          {
+            "title": "Hospital Participation | NY State of Health",
+            "url": "https://info.nystateofhealth.ny.gov/hospital-participation",
+            "description": "This tool is designed to help you find participating hospitals in an insurer's network in the Essential Plan and Qualified Health Plan programs."
+          }
+        ],
+        "patient_rating": [
+          {
+            "title": "NYC HEALTH + HOSPITALS/BELLEVUE - Updated March 2026 - Yelp",
+            "url": "https://www.yelp.com/biz/nyc-health-hospitals-bellevue-new-york",
+            "description": "They are kind, patient, knowledgeable, and provide exceptional service. I came here for sharp pains and they really went above and beyond to make me feel ..."
+          },
+          {
+            "title": "NYC Health and Hospitals - Bellevue - Hospital Details Table",
+            "url": "https://www.hospitalsafetygrade.org/table-details/nyc-health-and-hospitals-bellevue",
+            "description": "Responsiveness of hospital staff What's This? Responsiveness of hospital staff. Patients' perspectives of care are an important part of patient safety."
+          },
+          {
+            "title": "NYC Health and Hospitals-Bellevue in New York, NY",
+            "url": "https://health.usnews.com/best-hospitals/area/ny/bellevue-hospital-center-6212630",
+            "description": "NYC Health and Hospitals-Bellevue is rated excellent in its ability to discharge patients home after treatment, rather than discharge them to a post-acute care ..."
+          },
+          {
+            "title": "Bellevue Hospital Center - Medicare",
+            "url": "https://www.medicare.gov/care-compare/details/hospital/330204/view-all?city=New%20York&state=NY&zipcode=10024",
+            "description": "The overall star rating is based on how well a hospital performs across different areas of quality, such as treating heart attacks and pneumonia, readmission ..."
+          },
+          {
+            "title": "NYC Health + Hospitals/Bellevue - New York, NY - Healthgrades",
+            "url": "https://www.healthgrades.com/hospital/nyc-health-hospitals-bellevue-b3dd67",
+            "description": "Find the best healthcare options for your needs, all in one place. 63%. Patient Experience Rating. 3% lower than the national average."
+          }
+        ]
+      }
+    },
+    {
+      "id": "ChIJOzBevz32wokRyOlTYIko13s",
+      "name": "Mount Sinai West",
+      "address": "1000 10th Ave, New York, NY 10019, USA",
+      "phone": "(212) 523-4000",
+      "lat": 40.7698391,
+      "lng": -73.98716639999999,
+      "distance_miles": 1.2,
+      "rating": 2.9,
+      "user_ratings_total": 789,
+      "er_wait_minutes": null,
+      "insurance_accepted": [],
+      "hours": "Monday: Open 24 hours; Tuesday: Open 24 hours; Wednesday: Open 24 hours; Thursday: Open 24 hours; Friday: Open 24 hours; Saturday: Open 24 hours; Sunday: Open 24 hours",
+      "website": "https://www.mountsinai.org/locations/west?utm_source=Yext&utm_medium=local_listing&utm_campaign=MSR",
+      "google_maps_url": "https://maps.google.com/?cid=8923645757149669832&g_mp=Cilnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaE5lYXJieRACGAQgAA",
+      "web_details": {
+        "specialties_services": [
+          {
+            "title": "Mount Sinai West - NYC",
+            "url": "https://www.mountsinai.org/locations/west",
+            "description": "Breast Surgery · Cancer · Ear, Nose and Throat · Emergency Medicine · Heart - Cardiology · Hematology-Oncology Infusion Center · Lung and Pulmonology · Neurology ..."
+          },
+          {
+            "title": "Mount Sinai West Patient Care",
+            "url": "https://www.mountsinai.org/locations/west/care",
+            "description": "Palliative Care · Pediatrics · Physical and Rehabilitation Medicine · Primary Care · Pregnancy and Birth · Psychiatry · Radiation Oncology · Radiology ..."
+          },
+          {
+            "title": "Specialties | Mount Sinai - New York",
+            "url": "https://www.mountsinai.org/find-a-doctor/specialties",
+            "description": "Find a Doctor by Specialty · Neurosurgery · Ophthalmology · Orthopedics and Orthopedic Surgery · Pulmonary Medicine · Rehabilitation and Physical Medicine · Urology."
+          },
+          {
+            "title": "Mount Sinai Doctors - West 57th Street | Mount Sinai - New York",
+            "url": "https://www.mountsinai.org/locations/msd-west-57",
+            "description": "Coordinated, Multispecialty Care · Allergy · Cardiology · Dermatology · Ear, Nose, and Throat (at New York Eye and Ear Infirmary of Mount Sinai) · Endocrinology ..."
+          },
+          {
+            "title": "Mount Sinai Doctors-425 West 59th Street",
+            "url": "https://www.mountsinai.org/locations/msd-west-59",
+            "description": "Mount Sinai Doctors 425 West 59th Street · Colorectal · Endocrine · General surgery · Oncologic · Plastic and reconstructive surgery · Vascular and endovascular."
+          }
+        ],
+        "insurance_accepted": [
+          {
+            "title": "Mount Sinai West - Insurance Information",
+            "url": "https://www.mountsinai.org/about/insurance/msw",
+            "description": "Mount Sinai West (the “Hospital”) is a participating provider in many health plan networks. You can find a list of the plans in which we participate here."
+          },
+          {
+            "title": "Insurance and Payment Information - Mount Sinai Health System",
+            "url": "https://www.mountsinai.org/about/insurance",
+            "description": "You should check with the physician(s) arranging your hospital services to determine which insurance plans they participate in. Plan participation ..."
+          },
+          {
+            "title": "Accepted Insurance Plans - Choose Mount Sinai",
+            "url": "https://choosemountsinai.org/accepted-insurance-plans/",
+            "description": "Mount Sinai accepts Original Medicare and the following Medicare Advantage plans · Aetna Medicare Advantage · AmidaCare Medicare Advantage HMO SNP · ElderPlan ..."
+          },
+          {
+            "title": "Contracted Health Plans - Mount Sinai Medical Center",
+            "url": "https://www.msmc.com/patients-visitors/patient-information/contracted-health-plans/",
+            "description": "Mount Sinai Medical Center is proud to provide it's patients with access to most major insurance carriers. The below is a list of health plans and product."
+          },
+          {
+            "title": "Accepted Insurance Plans - Keep Mount Sinai",
+            "url": "https://keepmountsinai.org/accepted-insurance-plans/",
+            "description": "Mount Sinai accepts the following health plans that employers may offer to their employees: · Aetna · Anthem (in negotiation) · Beacon / Carelon · Centivo · Cigna ..."
+          }
+        ],
+        "patient_rating": [
+          {
+            "title": "Mount Sinai Morningside and Mount Sinai West Hospitals - Health",
+            "url": "https://health.usnews.com/best-hospitals/area/ny/st-lukes-roosevelt-hospital-center-6213335",
+            "description": "Mount Sinai Morningside and Mount Sinai West Hospitals has been rated 'High Performing' in Gastroenterology & GI Surgery by U.S. News & World ..."
+          },
+          {
+            "title": "MOUNT SINAI WEST - Updated March 2026 - Yelp",
+            "url": "https://www.yelp.com/biz/mount-sinai-west-new-york-4",
+            "description": "First off this hospital is beyond dirty, they put me in a room that had blood on the chair. That's a biohazard. I went to the restroom that they had in the ..."
+          },
+          {
+            "title": "Mount Sinai West | Ratings | Leapfrog Group",
+            "url": "https://ratings.leapfroggroup.org/facility/details/33-8801/mount-sinai-west-new-york-ny",
+            "description": "This hospital scored 120.00 out of 120.00 possible points. ... Hospitals should assess their culture of safety and hold leadership accountable for ..."
+          },
+          {
+            "title": "Mount Sinai West - New York, NY - Healthgrades",
+            "url": "https://www.healthgrades.com/hospital/mount-sinai-west-b10fe1",
+            "description": "This hospital has been recognized for Patient Safety Excellence Award™, America's 100 Best Hospitals for Cardiac Care Award™, and more."
+          },
+          {
+            "title": "Mount Sinai West - Medicare",
+            "url": "https://www.medicare.gov/care-compare/details/hospital/330046/view-all?city=New%20York&state=NY&zipcode=",
+            "description": "The overall star rating is based on how well a hospital performs across different areas of quality, such as treating heart attacks and pneumonia, readmission ..."
+          }
+        ]
+      }
+    },
+    {
+      "id": "ChIJWwL0jcNYwokRVCXGXtBSsgU",
+      "name": "NewYork-Presbyterian / Weill Cornell Medical Center",
+      "address": "525 E 68th St, New York, NY 10065, USA",
+      "phone": "(212) 746-5454",
+      "lat": 40.7644066,
+      "lng": -73.9541833,
+      "distance_miles": 1.7,
+      "rating": 3.6,
+      "user_ratings_total": 917,
+      "er_wait_minutes": null,
+      "insurance_accepted": [],
+      "hours": "Monday: Open 24 hours; Tuesday: Open 24 hours; Wednesday: Open 24 hours; Thursday: Open 24 hours; Friday: Open 24 hours; Saturday: Open 24 hours; Sunday: Open 24 hours",
+      "website": "https://www.nyp.org/locations/newyork-presbyterian-weill-cornell-medical-center?utm_source=yextgmb&utm_medium=organic&utm_campaign=yext_doctor_listings&y_source=1_MTM4MTIwMzQtNzE1LWxvY2F0aW9uLndlYnNpdGU%3D",
+      "google_maps_url": "https://maps.google.com/?cid=410481570940855636&g_mp=Cilnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaE5lYXJieRACGAQgAA",
+      "web_details": {
+        "specialties_services": [
+          {
+            "title": "NewYork-Presbyterian | Weill Cornell Medical Center",
+            "url": "https://www.nyp.org/locations/newyork-presbyterian-weill-cornell-medical-center",
+            "description": "The hospital specializes in general surgery, including cardiac surgeries. As part of NewYork-Presbyterian, one of the nation's most comprehensive academic ..."
+          },
+          {
+            "title": "Clinical Services | Patient Care",
+            "url": "https://weillcornell.org/services",
+            "description": "Clinical Departments and Centers ; Emergency Medicine. Emergency Medical Care ; Endocrinology. Hormone, Diabetes Care, and Weight Management."
+          },
+          {
+            "title": "Our Services",
+            "url": "https://www.nyp.org/services",
+            "description": "Featured areas of care · Cancer Care. Comprehensive cancer care, screening, and treatment services. · Digestive Diseases. Our digestive care team is experienced ..."
+          },
+          {
+            "title": "New York-Presbyterian Hospital - New York Weill Cornell Center",
+            "url": "https://preview-nysprofiles.ipro.org/hospital/printview/102961",
+            "description": "Services: Family Planning O/P; Medical Services - Other Medical Specialties; Medical Services - Primary Care; Pediatric O/P; Prenatal O/P. Washington Heights ..."
+          },
+          {
+            "title": "Specialty Practices at Weill Cornell Medical Center",
+            "url": "https://www.nyp.org/acn/specialty-care/specialty-practices-weill-cornell",
+            "description": "Practice Specialities | All ages. Cardiology 646-962-5558 - Book a Cardiology Appointment Online; Dentistry 212-746-5190; Dentistry (pediatric) 212-746-5119 ..."
+          }
+        ],
+        "insurance_accepted": [
+          {
+            "title": "Hospital Participating Plans - NewYork-Presbyterian",
+            "url": "https://www.nyp.org/patients-visitors/paying-for-care/hospital-participating-plans",
+            "description": "Accepted Plans at NewYork-Presbyterian Hospital · WellCare, Medicaid and CHP (NJ) · Wellcare,Medicare, American Progressive Life & Health, MLTC, and MLTSS."
+          },
+          {
+            "title": "Insurance and Billing Information | Weill Cornell Imaging at NewYork ...",
+            "url": "https://wcinyp.org/patients/insurance-and-billing",
+            "description": "We accept most insurance plans including some not listed. We will accept indemnity and out-of-network insurance carriers not listed."
+          },
+          {
+            "title": "[PDF] Insurance Plans Accepted - webmedia",
+            "url": "https://webmedia.weill.cornell.edu/pdf/pediatrics/GI/InsurancePlansAccepted.pdf",
+            "description": "Insurance Plans Accepted. The majority of our Weill Cornell physicians participate in the plans listed below. Please check with your insurance carrier to ..."
+          },
+          {
+            "title": "Insurance and Billing | Cardiology - Weill Cornell Medicine",
+            "url": "https://cardiology.weillcornell.org/patients/insurance-and-billing",
+            "description": "All of the physicians in our division accept Medicare and participate in most major insurance plans in New York. Be sure to verify that our physician is a ..."
+          },
+          {
+            "title": "Health Plan Networks | NewYork-Presbyterian Queens",
+            "url": "https://www.nyp.org/locations/queens/nyp-queens/health-plan-networks",
+            "description": "Accepted healthcare plans · WellCare, Medicaid and CHP (NJ) · Wellcare, Medicare, American Progressive Life & Health, MLTC, and MLTSS."
+          }
+        ],
+        "patient_rating": [
+          {
+            "title": "NEWYORK-PRESBYTERIAN/WEILL CORNELL MEDICAL CENTER",
+            "url": "https://www.yelp.com/biz/newyork-presbyterian-weill-cornell-medical-center-new-york",
+            "description": "The nurses that I encountered were very nice and seemed to give great care. The place seemed very clean. I'm not understanding the bad reviews. Unfortunately, ..."
+          },
+          {
+            "title": "New York-Presbyterian Hospital-Columbia and Cornell - Health",
+            "url": "https://health.usnews.com/best-hospitals/area/ny/new-york-presbyterian-university-hospital-of-columbia-and-cornell-6210024",
+            "description": "It is nationally ranked in 14 adult and 10 pediatric specialties and rated high performing in 22 adult procedures and conditions, including top ratings such as ..."
+          },
+          {
+            "title": "New York Presbyterian Hospital-NY Weill Cornell Medical Center",
+            "url": "https://www.yelp.com/biz/new-york-presbyterian-hospital-ny-weill-cornell-medical-center-new-york",
+            "description": "Overall they are given 3 stars because they didn't send me home with the antibiotics I needed. You literally are in a room with another person without any type ..."
+          },
+          {
+            "title": "NewYork-Presbyterian Hospital Named Best Hospital by U.S. News",
+            "url": "https://healthmatters.nyp.org/newyork-presbyterian-hospital-named-one-of-the-nations-best-hospitals-by-u-s-news-world-report-for-22nd-year-in-a-row-and-a-1-hospital-in-new-york/",
+            "description": "NewYork-Presbyterian Hospital is one of the best hospitals in the nation and a #1 hospital in New York by U.S. News & World Report."
+          },
+          {
+            "title": "NewYork-Presbyterian-Weill Cornell Medical Center | Ratings",
+            "url": "https://ratings.leapfroggroup.org/facility/details/33-0101/newyork-presbyterian-weill-cornell-medical-center-new-york-ny",
+            "description": "The Leapfrog Group ratings for NewYork-Presbyterian-Weill Cornell Medical Center."
           }
         ]
       }

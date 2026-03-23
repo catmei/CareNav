@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Emergency Hospital Finder</title>
   <link rel="stylesheet" href="/styles.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -44,7 +43,7 @@
           <span class="badge badge-live" id="agentBadge" style="display:none">LIVE</span>
         </div>
 
-        <!-- Voice Agent Placeholder -->
+        <!-- Voice Agent -->
         <div class="voice-agent" id="voiceAgent">
           <div class="voice-rings" id="voiceRings">
             <div class="ring ring-1"></div>
@@ -61,6 +60,11 @@
           </div>
           <p class="voice-status" id="voiceStatus">Click to start voice session</p>
           <p class="voice-hint">Powered by ElevenLabs</p>
+        </div>
+
+        <!-- Live Caption Bar -->
+        <div class="live-caption" id="liveCaption">
+          <p class="live-caption-text" id="liveCaptionText">Transcript will appear here...</p>
         </div>
 
         <!-- Triage Cards -->
@@ -110,11 +114,13 @@
           </div>
         </div>
 
-        <!-- Conversation Log -->
-        <div class="conversation" id="conversation">
-          <div class="msg agent">
-            <span class="msg-label">Agent</span>
-            <p>Hello! I'm your emergency hospital finder assistant. I'll help you find the best hospital for your situation. Let me start by confirming your location, then I'll ask a few questions about what you need.</p>
+        <!-- Debug Toolbar -->
+        <div class="debug-toolbar" id="debugToolbar">
+          <div class="debug-header">Debug Tools</div>
+          <div class="debug-buttons">
+            <button class="btn btn-outline btn-sm" id="debugTriageBtn">Simulate Triage</button>
+            <button class="btn btn-outline btn-sm" id="debugRecommendBtn">Simulate Recommend</button>
+            <button class="btn btn-outline btn-sm" id="debugResetBtn">Reset All</button>
           </div>
         </div>
 
@@ -127,24 +133,19 @@
           <div id="map" style="height:100%;width:100%"></div>
         </div>
 
-        <!-- Hospital Cards -->
+        <!-- Hospital Toggle Tabs + Detail -->
         <div class="hospitals-section">
           <div class="section-header">
             <h2>Nearby Hospitals</h2>
             <button class="btn btn-outline btn-sm" id="refreshBtn">Refresh</button>
           </div>
-          <div class="hospitals-list" id="hospitalsList">
+          <div class="hospital-detail" id="hospitalDetail">
             <div class="empty-state">
               <p>Allow location access to discover nearby hospitals, or enter your address above.</p>
             </div>
           </div>
         </div>
 
-        <!-- Recommendations -->
-        <div class="recommendations-section" id="recommendationsSection" style="display:none">
-          <h2>🎯 Recommended For You</h2>
-          <div class="recommendations-list" id="recommendationsList"></div>
-        </div>
       </section>
     </main>
 
@@ -187,7 +188,6 @@
     </div>
   </div>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script type="module" src="/app.js"></script>
 </body>
 </html>
