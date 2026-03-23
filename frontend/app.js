@@ -62,17 +62,21 @@ function initMap(lat, lng) {
       center: { lat, lng },
       zoom: 13,
       styles: [
-        { elementType: "geometry", stylers: [{ color: "#0c1225" }] },
-        { elementType: "labels.text.stroke", stylers: [{ color: "#0a0f1e" }] },
-        { elementType: "labels.text.fill", stylers: [{ color: "#4a8a9a" }] },
-        { featureType: "water", elementType: "geometry.fill", stylers: [{ color: "#060a14" }] },
-        { featureType: "road", elementType: "geometry", stylers: [{ color: "#16253d" }] },
-        { featureType: "road", elementType: "geometry.stroke", stylers: [{ color: "#0d1a2d" }] },
-        { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#1a3050" }] },
-        { featureType: "poi", elementType: "geometry", stylers: [{ color: "#111d35" }] },
+        { elementType: "geometry", stylers: [{ color: "#f0ebe5" }] },
+        { elementType: "labels.text.stroke", stylers: [{ color: "#f5f2ee" }] },
+        { elementType: "labels.text.fill", stylers: [{ color: "#8a7f99" }] },
+        { featureType: "water", elementType: "geometry.fill", stylers: [{ color: "#d4dce8" }] },
+        { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#9ba8b8" }] },
+        { featureType: "road", elementType: "geometry", stylers: [{ color: "#ffffff" }] },
+        { featureType: "road", elementType: "geometry.stroke", stylers: [{ color: "#e2ddd7" }] },
+        { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#f5ede4" }] },
+        { featureType: "road.highway", elementType: "geometry.stroke", stylers: [{ color: "#dcd4ca" }] },
+        { featureType: "poi", elementType: "geometry", stylers: [{ color: "#e8e2da" }] },
         { featureType: "poi", elementType: "labels", stylers: [{ visibility: "off" }] },
+        { featureType: "poi.park", elementType: "geometry", stylers: [{ color: "#dde8d8" }] },
         { featureType: "transit", stylers: [{ visibility: "off" }] },
-        { featureType: "administrative", elementType: "geometry.stroke", stylers: [{ color: "#1a2a45" }] },
+        { featureType: "administrative", elementType: "geometry.stroke", stylers: [{ color: "#d8d0c8" }] },
+        { featureType: "landscape.man_made", elementType: "geometry", stylers: [{ color: "#ede8e2" }] },
       ],
       disableDefaultUI: false,
       zoomControl: true,
@@ -96,7 +100,7 @@ function showUserOnMap() {
     icon: {
       path: google.maps.SymbolPath.CIRCLE,
       scale: 10,
-      fillColor: "#00d4ff",
+      fillColor: "#9b8ec4",
       fillOpacity: 1,
       strokeColor: "#ffffff",
       strokeWeight: 3,
@@ -127,7 +131,7 @@ function plotHospitalsOnMap(hospitals) {
       icon: {
         path: google.maps.SymbolPath.CIRCLE,
         scale: 14,
-        fillColor: "#F5A623",
+        fillColor: "#b8916e",
         fillOpacity: 1,
         strokeColor: "#ffffff",
         strokeWeight: 2,
@@ -277,7 +281,7 @@ function selectHospital(id, recommendation) {
       m.setIcon({
         path: google.maps.SymbolPath.CIRCLE,
         scale: i === idx ? 16 : 14,
-        fillColor: i === idx ? "#EA4335" : "#F5A623",
+        fillColor: i === idx ? "#d4727a" : "#b8916e",
         fillOpacity: 1,
         strokeColor: "#ffffff",
         strokeWeight: i === idx ? 3 : 2,
@@ -311,7 +315,7 @@ function selectHospital(id, recommendation) {
           <div class="card-name">${h.name}</div>
           <div class="card-address">${h.address}</div>
         </div>
-        ${h.rating !== null ? `<span class="card-rating">⭐ ${h.rating}${h.user_ratings_total ? ` (${h.user_ratings_total})` : ""}</span>` : ""}
+        ${h.rating !== null ? `<span class="card-rating"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> ${h.rating}${h.user_ratings_total ? ` (${h.user_ratings_total})` : ""}</span>` : ""}
       </div>
 
       <div class="detail-info-row">
@@ -321,9 +325,9 @@ function selectHospital(id, recommendation) {
       </div>
 
       <div class="detail-actions-row">
-        ${h.phone !== "N/A" ? `<a href="tel:${h.phone}" class="btn btn-call btn-sm">📞 ${h.phone}</a>` : ""}
-        ${h.website ? `<a href="${h.website}" target="_blank" rel="noopener" class="btn btn-outline btn-sm">🌐 Website</a>` : ""}
-        <a href="${h.google_maps_url || `https://www.google.com/maps/search/?api=1&query=${h.lat},${h.lng}`}" target="_blank" rel="noopener" class="btn btn-outline btn-sm">🗺 Directions</a>
+        ${h.phone !== "N/A" ? `<a href="tel:${h.phone}" class="btn btn-call btn-sm"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>${h.phone}</a>` : ""}
+        ${h.website ? `<a href="${h.website}" target="_blank" rel="noopener" class="btn btn-outline btn-sm"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> Website</a>` : ""}
+        <a href="${h.google_maps_url || `https://www.google.com/maps/search/?api=1&query=${h.lat},${h.lng}`}" target="_blank" rel="noopener" class="btn btn-outline btn-sm"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg> Directions</a>
       </div>
 
       ${h.insurance_accepted.length ? `
@@ -368,7 +372,7 @@ function renderWebDetails(web_details) {
   return `
     <div class="detail-section web-details-section">
       <div class="firecrawl-toggle" onclick="toggleFirecrawl(this)">
-        <span class="firecrawl-label">🔥 Firecrawl Search</span>
+        <span class="firecrawl-label"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Firecrawl Search</span>
         <span class="firecrawl-arrow">&#9654;</span>
       </div>
       <div class="web-details-list firecrawl-collapsed">${items}</div>
