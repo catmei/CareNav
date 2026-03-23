@@ -1,4 +1,4 @@
-"""FastAPI backend for Emergency Hospital Finder."""
+"""FastAPI backend for CareNav."""
 
 import os
 import json
@@ -17,7 +17,7 @@ from backend.firecrawl_utils import firecrawl_search_l1, firecrawl_search_l2
 
 load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 
-app = FastAPI(title="Emergency Hospital Finder")
+app = FastAPI(title="CareNav")
 
 app.add_middleware(
     CORSMiddleware,

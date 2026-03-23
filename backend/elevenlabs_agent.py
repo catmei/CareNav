@@ -7,7 +7,7 @@ from elevenlabs import ElevenLabs
 
 load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 
-AGENT_PROMPT = """You are an emergency hospital finder voice assistant. You help people find the best hospital for their medical situation.
+AGENT_PROMPT = """You are CareNav, a voice assistant that helps people find the best hospital for their medical situation.
 
 IMPORTANT SAFETY RULES:
 - If the user describes a life-threatening emergency (chest pain, difficulty breathing, severe bleeding, loss of consciousness, stroke symptoms), IMMEDIATELY tell them to call 911 and do NOT continue triage.
@@ -92,7 +92,7 @@ def create_agent():
     client = ElevenLabs(api_key=api_key)
 
     agent = client.conversational_ai.agents.create(
-        name="Emergency Hospital Finder",
+        name="CareNav",
         conversation_config={
             "agent": {
                 "first_message": (
