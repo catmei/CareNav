@@ -364,7 +364,7 @@ function renderWebDetails(web_details) {
   return `
     <div class="detail-section web-details-section">
       <div class="firecrawl-toggle" onclick="toggleFirecrawl(this)">
-        <span class="firecrawl-label">🔥 Firecrawl</span>
+        <span class="firecrawl-label">🔥 Firecrawl Search</span>
         <span class="firecrawl-arrow">&#9654;</span>
       </div>
       <div class="web-details-list firecrawl-collapsed">${items}</div>
@@ -415,10 +415,7 @@ async function startSession() {
       phone: h.phone,
       distance_miles: h.distance_miles,
       hours: h.hours,
-      insurance_accepted: h.insurance_accepted,
       rating: h.rating,
-      website: h.website,
-      web_details: h.web_details,
     }));
 
     // Start ElevenLabs conversation
@@ -437,6 +434,52 @@ async function startSession() {
         display_recommendation: async (params) => {
           showRecommendationFromAgent(params);
           return "Recommendation displayed successfully in the UI.";
+        },
+        fetch_hospital_search_l1: async (params) => {
+          console.log("[fetch_hospital_search_l1] Called with:", params);
+          showSearchLoading("l1");
+          try {
+            const res = await fetch("/api/hospitals/search-l1", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ triage_data: params }),
+            });
+            if (!res.ok) {
+              showSearchStatus("l1", "Failed");
+              return "Search unavailable. Recommend based on distance and rating.";
+            }
+            const data = await res.json();
+            console.log("[fetch_hospital_search_l1] Received, length:", data.search_results.length);
+            renderSearchL1Results(data.search_results);
+            return data.search_results;
+          } catch (err) {
+            console.error("[fetch_hospital_search_l1] Error:", err);
+            showSearchStatus("l1", "Failed");
+            return "Search unavailable. Recommend based on distance and rating.";
+          }
+        },
+        fetch_hospital_search_l2: async (params) => {
+          console.log("[fetch_hospital_search_l2] Called with:", params);
+          showSearchLoading("l2");
+          try {
+            const res = await fetch("/api/hospitals/search-l2", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ query: params.query }),
+            });
+            if (!res.ok) {
+              showSearchStatus("l2", "Failed");
+              return "Search unavailable. Proceed with existing information.";
+            }
+            const data = await res.json();
+            console.log("[fetch_hospital_search_l2] Received, length:", data.search_results.length);
+            renderSearchL2Results(params.query, data.search_results);
+            return data.search_results;
+          } catch (err) {
+            console.error("[fetch_hospital_search_l2] Error:", err);
+            showSearchStatus("l2", "Failed");
+            return "Search unavailable. Proceed with existing information.";
+          }
         },
       },
       onMessage: (msg) => {
@@ -466,6 +509,7 @@ async function startSession() {
     agentBadge.style.display = "inline-block";
     voiceStatus.textContent = "Session active — listening...";
     resetTriageCards();
+    resetSearchActivity();
   } catch (err) {
     console.error("Failed to start session:", err);
     voiceStatus.textContent = "Connection failed. Click to retry.";
@@ -519,7 +563,7 @@ function showRecommendationFromAgent(params) {
 // === Triage Card Updates ===
 function updateTriageCard({ card_number, answer }) {
   const num = Math.round(card_number);
-  if (num < 1 || num > 5) return;
+  if (num < 1 || num > 4) return;
 
   const card = document.getElementById(`triageCard${num}`);
   const answerEl = document.getElementById(`triageAnswer${num}`);
@@ -532,21 +576,31 @@ function updateTriageCard({ card_number, answer }) {
   statusEl.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
 
   // Highlight the next unanswered card as active
-  for (let i = 1; i <= 5; i++) {
+  for (let i = 1; i <= 4; i++) {
     const c = document.getElementById(`triageCard${i}`);
     if (c) c.classList.remove("active");
   }
-  for (let i = num + 1; i <= 5; i++) {
+  let allDone = true;
+  for (let i = 1; i <= 4; i++) {
     const c = document.getElementById(`triageCard${i}`);
     if (c && !c.classList.contains("answered")) {
-      c.classList.add("active");
-      break;
+      if (allDone) {
+        c.classList.add("active");
+        allDone = false;
+      }
     }
+  }
+  // Update triage step status
+  if (allDone) {
+    markStepDone("triage");
+  } else {
+    triageStepStatus.textContent = "In Progress";
+    stepTriage.classList.add("active", "open");
   }
 }
 
 function resetTriageCards() {
-  for (let i = 1; i <= 5; i++) {
+  for (let i = 1; i <= 4; i++) {
     const card = document.getElementById(`triageCard${i}`);
     const answerEl = document.getElementById(`triageAnswer${i}`);
     const statusEl = document.getElementById(`triageStatus${i}`);
@@ -557,6 +611,9 @@ function resetTriageCards() {
   // Mark first card as active
   const first = document.getElementById("triageCard1");
   if (first) first.classList.add("active");
+  // Activate triage step
+  activateStep("triage");
+  triageStepStatus.textContent = "In Progress";
 }
 
 // === Live Caption helpers ===
@@ -571,18 +628,133 @@ function clearCaption() {
   liveCaptionText.textContent = "";
 }
 
+// === Process Steps (Accordion) ===
+const stepTriage = $("#stepTriage");
+const stepL1 = $("#stepL1");
+const stepL2 = $("#stepL2");
+const triageStepStatus = $("#triageStepStatus");
+const l1StepStatus = $("#l1StepStatus");
+const l2StepStatus = $("#l2StepStatus");
+const searchL1Content = $("#searchL1Content");
+const searchL2Content = $("#searchL2Content");
+
+function toggleStep(step) {
+  const el = step === "triage" ? stepTriage : step === "l1" ? stepL1 : stepL2;
+  el.classList.toggle("open");
+}
+window.toggleStep = toggleStep;
+
+function activateStep(step) {
+  // Close all, open the target
+  [stepTriage, stepL1, stepL2].forEach((el) => {
+    el.classList.remove("active");
+    el.classList.remove("open");
+  });
+  const el = step === "triage" ? stepTriage : step === "l1" ? stepL1 : stepL2;
+  el.classList.add("active", "open");
+}
+
+function markStepDone(step) {
+  const el = step === "triage" ? stepTriage : step === "l1" ? stepL1 : stepL2;
+  const statusEl = step === "triage" ? triageStepStatus : step === "l1" ? l1StepStatus : l2StepStatus;
+  el.classList.remove("active", "loading");
+  el.classList.add("done");
+  el.classList.remove("open");
+  statusEl.textContent = "Done";
+}
+
+function markStepLoading(step) {
+  const el = step === "triage" ? stepTriage : step === "l1" ? stepL1 : stepL2;
+  const statusEl = step === "triage" ? triageStepStatus : step === "l1" ? l1StepStatus : l2StepStatus;
+  el.classList.remove("done");
+  el.classList.add("active", "loading", "open");
+  statusEl.textContent = "Searching...";
+}
+
+function showSearchLoading(layer) {
+  markStepLoading(layer);
+}
+
+function showSearchStatus(layer, text) {
+  const statusEl = layer === "l1" ? l1StepStatus : l2StepStatus;
+  statusEl.textContent = text;
+}
+
+function renderSearchL1Results(rawText) {
+  markStepDone("l1");
+  const hospitals = rawText.split(/\n\n(?====)/).filter(Boolean);
+  let html = '<div class="search-layer-results">';
+  for (const block of hospitals) {
+    const lines = block.split("\n");
+    const header = lines[0]?.replace(/^=+\s*/, "").replace(/\s*=+$/, "") || "";
+    html += `<div class="search-result-item">`;
+    html += `<div class="search-result-hospital">${escapeHtml(header)}</div>`;
+    for (let i = 1; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (line.startsWith("[") && line.endsWith("]:")) {
+        const currentLabel = line.slice(1, -2);
+        html += `<div class="search-result-label">${escapeHtml(currentLabel)}</div>`;
+      } else if (line.startsWith("- ")) {
+        const text = line.slice(2).trim();
+        const display = text.length > 150 ? text.slice(0, 150) + "..." : text;
+        html += `<div class="search-result-text">${escapeHtml(display)}</div>`;
+      }
+    }
+    html += `</div>`;
+  }
+  html += "</div>";
+  searchL1Content.innerHTML = html;
+}
+
+function renderSearchL2Results(query, rawText) {
+  markStepDone("l2");
+  const lines = rawText.split("\n").filter(Boolean);
+  let html = `<div class="search-result-query">Query: "${escapeHtml(query)}"</div>`;
+  html += '<div class="search-layer-results">';
+  html += `<div class="search-result-item">`;
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (trimmed.startsWith("- ")) {
+      const text = trimmed.slice(2).trim();
+      const display = text.length > 200 ? text.slice(0, 200) + "..." : text;
+      html += `<div class="search-result-text">${escapeHtml(display)}</div>`;
+    }
+  }
+  html += `</div></div>`;
+  searchL2Content.innerHTML = html;
+}
+
+function escapeHtml(text) {
+  const div = document.createElement("div");
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function resetSearchActivity() {
+  searchL1Content.innerHTML = "";
+  searchL2Content.innerHTML = "";
+  // Reset step states
+  [stepTriage, stepL1, stepL2].forEach((el) => {
+    el.classList.remove("active", "done", "loading", "open");
+  });
+  triageStepStatus.textContent = "Waiting";
+  l1StepStatus.textContent = "Pending";
+  l2StepStatus.textContent = "Pending";
+}
+
 // === Debug Tools ===
 const debugTriageBtn = $("#debugTriageBtn");
+const debugL1Btn = $("#debugL1Btn");
+const debugL2Btn = $("#debugL2Btn");
 const debugRecommendBtn = $("#debugRecommendBtn");
 const debugResetBtn = $("#debugResetBtn");
 
 let debugTriageStep = 0;
 const debugTriageData = [
-  { card_number: 1, answer: "No, not life-threatening" },
-  { card_number: 2, answer: "Headache and mild fever" },
-  { card_number: 3, answer: "5/10 - Moderate" },
-  { card_number: 4, answer: "Since yesterday" },
-  { card_number: 5, answer: "Blue Cross" },
+  { card_number: 1, answer: "Headache and mild fever" },
+  { card_number: 2, answer: "6/10 - Moderate" },
+  { card_number: 3, answer: "Since last night, ~12 hours" },
+  { card_number: 4, answer: "Blue Cross Blue Shield" },
 ];
 
 debugTriageBtn.addEventListener("click", () => {
@@ -593,7 +765,55 @@ debugTriageBtn.addEventListener("click", () => {
     showCaption(`[Debug] Triage card ${data.card_number}: ${data.answer}`);
     debugTriageStep++;
   } else {
-    showCaption("[Debug] All triage cards filled. Try Simulate Recommend.");
+    showCaption("[Debug] All triage cards filled. Try Search L1.");
+  }
+});
+
+debugL1Btn.addEventListener("click", async () => {
+  showCaption("[Debug] Running Layer 1 search...");
+  showSearchLoading("l1");
+  try {
+    const res = await fetch("/api/hospitals/search-l1", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        triage_data: {
+          symptoms: "Headache and mild fever",
+          severity: "5/10 - Moderate",
+          duration: "Since yesterday",
+          insurance: "Blue Cross",
+        },
+      }),
+    });
+    const data = await res.json();
+    console.log("[Debug L1] Results:", data.search_results);
+    renderSearchL1Results(data.search_results);
+    showCaption(`[Debug] L1 search complete. See results below.`);
+  } catch (err) {
+    console.error("[Debug L1] Error:", err);
+    showSearchStatus("l1", "Failed");
+    showCaption("[Debug] L1 search failed. Check console.");
+  }
+});
+
+debugL2Btn.addEventListener("click", async () => {
+  const query = "NYU Langone headache fever emergency department Blue Cross insurance wait time reviews";
+  showCaption("[Debug] Running Layer 2 search...");
+  showSearchLoading("l2");
+  try {
+    const res = await fetch("/api/hospitals/search-l2", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query }),
+    });
+    const data = await res.json();
+    console.log("[Debug L2] Results:", data.search_results);
+    renderSearchL2Results(query, data.search_results);
+    showCaption(`[Debug] L2 search complete. See results below.`);
+  } catch (err) {
+    console.error("[Debug L2] Error:", err);
+    showSearchStatus("l2", "Failed");
+    showCaption("[Debug] L2 search failed. Check console.");
   }
 });
 
@@ -612,6 +832,7 @@ debugRecommendBtn.addEventListener("click", () => {
 
 debugResetBtn.addEventListener("click", () => {
   resetTriageCards();
+  resetSearchActivity();
   debugTriageStep = 0;
   clearCaption();
   liveCaptionText.textContent = "Transcript will appear here...";

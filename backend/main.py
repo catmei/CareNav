@@ -10,9 +10,10 @@ from fastapi import FastAPI, Query, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from elevenlabs import ElevenLabs
+from pydantic import BaseModel
 
 from backend.map_utils import fetch_google_hospitals, normalize_hospital
-from backend.firecrawl_utils import firecrawl_search_hospital_details
+from backend.firecrawl_utils import firecrawl_search_l1, firecrawl_search_l2
 
 load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 
@@ -31,11 +32,9 @@ async def get_enriched_hospitals(
     lat: float = Query(..., description="User latitude"),
     lng: float = Query(..., description="User longitude"),
 ):
-    """Return the 5 nearest hospitals, each enriched with targeted web searches.
+    """Return the 5 nearest hospitals from Google Places (no Firecrawl).
 
-    Each hospital gains a ``web_details`` object with keys:
-      specialties_services, insurance_accepted, patient_rating.
-    Requires GOOGLE_MAPS_API_KEY and optionally FIRECRAWL_API_KEY.
+    Firecrawl searches are deferred to Layer 1/Layer 2 after triage.
     """
     cache_path = Path(__file__).resolve().parent / "cached_hospitals.json"
 
@@ -44,27 +43,50 @@ async def get_enriched_hospitals(
         return json.loads(cache_path.read_text(encoding="utf-8"))
 
     async with httpx.AsyncClient() as client:
-        # Fetch hospitals from Google Places API
         places = await fetch_google_hospitals(client, lat, lng)
         hospitals = [h for p in places if (h := normalize_hospital(p, lat, lng))]
         hospitals.sort(key=lambda x: x["distance_miles"])
         top5 = hospitals[:5]
 
-        # Enrich with Firecrawl web search results
-        fc_tasks = [firecrawl_search_hospital_details(client, h["name"]) for h in top5]
-        web_details_per_hospital = await asyncio.gather(*fc_tasks)
-
-    enriched = [
-        {**hospital, "web_details": web_details}
-        for hospital, web_details in zip(top5, web_details_per_hospital)
-    ]
-
-    result = {"hospitals": enriched}
+    result = {"hospitals": top5}
 
     # Save for future runs
     cache_path.write_text(json.dumps(result, indent=2, ensure_ascii=False), encoding="utf-8")
 
     return result
+
+
+class L1SearchRequest(BaseModel):
+    triage_data: dict
+
+
+@app.post("/api/hospitals/search-l1")
+async def search_hospitals_l1(request: L1SearchRequest):
+    """Layer 1: triage-informed Firecrawl search for each cached hospital."""
+    cache_path = Path(__file__).resolve().parent / "cached_hospitals.json"
+    if not cache_path.exists():
+        raise HTTPException(status_code=400, detail="No cached hospitals. Call /api/hospitals/enriched first.")
+
+    cached = json.loads(cache_path.read_text(encoding="utf-8"))
+    hospitals = cached.get("hospitals", [])
+
+    async with httpx.AsyncClient() as client:
+        search_results = await firecrawl_search_l1(client, hospitals, request.triage_data)
+
+    return {"search_results": search_results}
+
+
+class L2SearchRequest(BaseModel):
+    query: str
+
+
+@app.post("/api/hospitals/search-l2")
+async def search_hospitals_l2(request: L2SearchRequest):
+    """Layer 2: agent-driven refined Firecrawl search."""
+    async with httpx.AsyncClient() as client:
+        search_results = await firecrawl_search_l2(client, request.query)
+
+    return {"search_results": search_results}
 
 
 @app.get("/api/maps-key")

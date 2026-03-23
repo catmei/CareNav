@@ -168,20 +168,114 @@ a:hover { text-decoration: underline; }
 .voice-status { font-size: 14px; color: var(--text); font-weight: 500; }
 .voice-hint { font-size: 12px; color: var(--text-dim); }
 
-/* === Triage Cards === */
-.triage-section {
-  padding: 12px 20px;
+/* === Process Steps (Accordion) === */
+.process-steps {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--border);
+}
+.process-step {
   border-bottom: 1px solid var(--border);
 }
-.triage-header {
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--text-dim);
-  margin-bottom: 10px;
+.process-step-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s;
 }
+.process-step-header:hover { background: var(--surface-2); }
+.step-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.step-header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.step-number {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-dim);
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+.step-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+.step-status {
+  font-size: 11px;
+  color: var(--text-dim);
+  font-weight: 500;
+}
+.step-arrow {
+  font-size: 10px;
+  color: var(--text-dim);
+  transition: transform 0.2s ease;
+  display: inline-block;
+}
+.process-step.open .step-arrow {
+  transform: rotate(90deg);
+}
+.process-step-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s ease;
+}
+.process-step.open .process-step-content {
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+/* Active step styling */
+.process-step.active .step-number {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(59, 130, 246, 0.1);
+}
+.process-step.active .step-title {
+  color: var(--accent);
+}
+.process-step.active .step-status {
+  color: var(--accent);
+}
+.process-step.active .process-step-header {
+  background: rgba(59, 130, 246, 0.03);
+}
+
+/* Done step styling */
+.process-step.done .step-number {
+  border-color: var(--success);
+  color: var(--success);
+  background: rgba(34, 197, 94, 0.1);
+}
+.process-step.done .step-status {
+  color: var(--success);
+}
+
+/* Loading step styling */
+.process-step.loading .step-status {
+  color: var(--warning);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+/* === Triage Cards === */
 .triage-cards {
+  padding: 10px 20px 14px;
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -523,6 +617,45 @@ a:hover { text-decoration: underline; }
 .detail-section { margin-bottom: 10px; }
 .detail-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-dim); margin-bottom: 4px; }
 .detail-text { font-size: 13px; color: var(--text); line-height: 1.5; }
+
+/* === Search Results inside Process Steps === */
+.search-layer-results {
+  padding: 8px 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.search-result-item {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+}
+.search-result-hospital {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.search-result-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: #8b5cf6;
+  margin-bottom: 2px;
+}
+.search-result-text {
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+.search-result-query {
+  font-size: 11px;
+  color: var(--text-dim);
+  font-style: italic;
+  padding: 6px 14px 10px;
+}
 
 /* === Firecrawl Results (collapsible) === */
 .web-details-section { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }

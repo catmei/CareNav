@@ -67,50 +67,86 @@
           <p class="live-caption-text" id="liveCaptionText">Transcript will appear here...</p>
         </div>
 
-        <!-- Triage Cards -->
-        <div class="triage-section" id="triageSection">
-          <div class="triage-header">Triage Progress</div>
-          <div class="triage-cards">
-            <div class="triage-card" id="triageCard1" data-card="1">
-              <div class="triage-card-icon">1</div>
-              <div class="triage-card-body">
-                <div class="triage-card-label">Emergency Check</div>
-                <div class="triage-card-answer" id="triageAnswer1">Waiting...</div>
+        <!-- Process Steps -->
+        <div class="process-steps">
+          <!-- Step 1: Triage -->
+          <div class="process-step" id="stepTriage" data-step="triage">
+            <div class="process-step-header" onclick="toggleStep('triage')">
+              <div class="step-header-left">
+                <span class="step-number">1</span>
+                <span class="step-title">Triage</span>
               </div>
-              <div class="triage-card-status" id="triageStatus1"></div>
-            </div>
-            <div class="triage-card" id="triageCard2" data-card="2">
-              <div class="triage-card-icon">2</div>
-              <div class="triage-card-body">
-                <div class="triage-card-label">Symptoms</div>
-                <div class="triage-card-answer" id="triageAnswer2">Waiting...</div>
+              <div class="step-header-right">
+                <span class="step-status" id="triageStepStatus">Waiting</span>
+                <span class="step-arrow">&#9654;</span>
               </div>
-              <div class="triage-card-status" id="triageStatus2"></div>
             </div>
-            <div class="triage-card" id="triageCard3" data-card="3">
-              <div class="triage-card-icon">3</div>
-              <div class="triage-card-body">
-                <div class="triage-card-label">Severity</div>
-                <div class="triage-card-answer" id="triageAnswer3">Waiting...</div>
+            <div class="process-step-content" id="triageContent">
+              <div class="triage-cards">
+                <div class="triage-card" id="triageCard1" data-card="1">
+                  <div class="triage-card-icon">1</div>
+                  <div class="triage-card-body">
+                    <div class="triage-card-label">Symptoms</div>
+                    <div class="triage-card-answer" id="triageAnswer1">Waiting...</div>
+                  </div>
+                  <div class="triage-card-status" id="triageStatus1"></div>
+                </div>
+                <div class="triage-card" id="triageCard2" data-card="2">
+                  <div class="triage-card-icon">2</div>
+                  <div class="triage-card-body">
+                    <div class="triage-card-label">Severity</div>
+                    <div class="triage-card-answer" id="triageAnswer2">Waiting...</div>
+                  </div>
+                  <div class="triage-card-status" id="triageStatus2"></div>
+                </div>
+                <div class="triage-card" id="triageCard3" data-card="3">
+                  <div class="triage-card-icon">3</div>
+                  <div class="triage-card-body">
+                    <div class="triage-card-label">Duration</div>
+                    <div class="triage-card-answer" id="triageAnswer3">Waiting...</div>
+                  </div>
+                  <div class="triage-card-status" id="triageStatus3"></div>
+                </div>
+                <div class="triage-card" id="triageCard4" data-card="4">
+                  <div class="triage-card-icon">4</div>
+                  <div class="triage-card-body">
+                    <div class="triage-card-label">Insurance</div>
+                    <div class="triage-card-answer" id="triageAnswer4">Waiting...</div>
+                  </div>
+                  <div class="triage-card-status" id="triageStatus4"></div>
+                </div>
               </div>
-              <div class="triage-card-status" id="triageStatus3"></div>
             </div>
-            <div class="triage-card" id="triageCard4" data-card="4">
-              <div class="triage-card-icon">4</div>
-              <div class="triage-card-body">
-                <div class="triage-card-label">Duration</div>
-                <div class="triage-card-answer" id="triageAnswer4">Waiting...</div>
+          </div>
+
+          <!-- Step 2: L1 Search -->
+          <div class="process-step" id="stepL1" data-step="l1">
+            <div class="process-step-header" onclick="toggleStep('l1')">
+              <div class="step-header-left">
+                <span class="step-number">2</span>
+                <span class="step-title">L1 Search</span>
               </div>
-              <div class="triage-card-status" id="triageStatus4"></div>
-            </div>
-            <div class="triage-card" id="triageCard5" data-card="5">
-              <div class="triage-card-icon">5</div>
-              <div class="triage-card-body">
-                <div class="triage-card-label">Insurance</div>
-                <div class="triage-card-answer" id="triageAnswer5">Waiting...</div>
+              <div class="step-header-right">
+                <span class="step-status" id="l1StepStatus">Pending</span>
+                <span class="step-arrow">&#9654;</span>
               </div>
-              <div class="triage-card-status" id="triageStatus5"></div>
             </div>
+            <div class="process-step-content" id="searchL1Content"></div>
+          </div>
+
+          <!-- Step 3: L2 Search -->
+          <div class="process-step" id="stepL2" data-step="l2">
+            <div class="process-step-header" onclick="toggleStep('l2')">
+              <div class="step-header-left">
+                <span class="step-number">3</span>
+                <span class="step-title">L2 Search</span>
+              </div>
+              <div class="step-header-right">
+                <span class="step-status" id="l2StepStatus">Pending</span>
+                <span class="step-arrow">&#9654;</span>
+              </div>
+            </div>
+            <div class="process-step-content" id="searchL2Content"></div>
           </div>
         </div>
 
@@ -119,6 +155,8 @@
           <div class="debug-header">Debug Tools</div>
           <div class="debug-buttons">
             <button class="btn btn-outline btn-sm" id="debugTriageBtn">Simulate Triage</button>
+            <button class="btn btn-outline btn-sm" id="debugL1Btn">Search L1</button>
+            <button class="btn btn-outline btn-sm" id="debugL2Btn">Search L2</button>
             <button class="btn btn-outline btn-sm" id="debugRecommendBtn">Simulate Recommend</button>
             <button class="btn btn-outline btn-sm" id="debugResetBtn">Reset All</button>
           </div>
