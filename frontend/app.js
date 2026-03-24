@@ -450,7 +450,7 @@ async function startSession() {
             const res = await fetch("/api/hospitals/search-l1", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ triage_data: params }),
+              body: JSON.stringify({ triage_data: params, hospitals: state.hospitals }),
             });
             if (!res.ok) {
               showSearchStatus("l1", "Failed");
@@ -571,7 +571,7 @@ function showRecommendationFromAgent(params) {
 // === Triage Card Updates ===
 function updateTriageCard({ card_number, answer }) {
   const num = Math.round(card_number);
-  if (num < 1 || num > 4) return;
+  if (num < 1 || num > 3) return;
 
   const card = document.getElementById(`triageCard${num}`);
   const answerEl = document.getElementById(`triageAnswer${num}`);
@@ -584,12 +584,12 @@ function updateTriageCard({ card_number, answer }) {
   statusEl.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
 
   // Highlight the next unanswered card as active
-  for (let i = 1; i <= 4; i++) {
+  for (let i = 1; i <= 3; i++) {
     const c = document.getElementById(`triageCard${i}`);
     if (c) c.classList.remove("active");
   }
   let allDone = true;
-  for (let i = 1; i <= 4; i++) {
+  for (let i = 1; i <= 3; i++) {
     const c = document.getElementById(`triageCard${i}`);
     if (c && !c.classList.contains("answered")) {
       if (allDone) {
@@ -608,7 +608,7 @@ function updateTriageCard({ card_number, answer }) {
 }
 
 function resetTriageCards() {
-  for (let i = 1; i <= 4; i++) {
+  for (let i = 1; i <= 3; i++) {
     const card = document.getElementById(`triageCard${i}`);
     const answerEl = document.getElementById(`triageAnswer${i}`);
     const statusEl = document.getElementById(`triageStatus${i}`);
@@ -759,10 +759,9 @@ const debugResetBtn = $("#debugResetBtn");
 
 let debugTriageStep = 0;
 const debugTriageData = [
-  { card_number: 1, answer: "Headache and mild fever" },
-  { card_number: 2, answer: "6/10 - Moderate" },
-  { card_number: 3, answer: "Since last night, ~12 hours" },
-  { card_number: 4, answer: "Blue Cross Blue Shield" },
+  { card_number: 1, answer: "6-year-old, fall from monkey bars — swollen wrist, unable to move it" },
+  { card_number: 2, answer: "6/10 — 30 minutes ago, swelling increasing" },
+  { card_number: 3, answer: "Aetna" },
 ];
 
 debugTriageBtn.addEventListener("click", () => {
@@ -786,11 +785,12 @@ debugL1Btn.addEventListener("click", async () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         triage_data: {
-          symptoms: "Headache and mild fever",
-          severity: "5/10 - Moderate",
-          duration: "Since yesterday",
-          insurance: "Blue Cross",
+          symptoms: "Fall from monkey bars, swollen wrist, unable to move it",
+          severity: "6/10",
+          duration: "30 minutes ago",
+          insurance: "Aetna",
         },
+        hospitals: state.hospitals,
       }),
     });
     const data = await res.json();

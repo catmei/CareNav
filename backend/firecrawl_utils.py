@@ -117,21 +117,21 @@ async def firecrawl_search_l1(
     tasks = [_firecrawl_search(client, query) for _, _, query in work]
     results = await asyncio.gather(*tasks)
 
-    # Save raw results for inspection
-    raw_data = []
-    for (idx, label, query), result in zip(work, results):
-        raw_data.append({
-            "hospital": hospitals[idx]["name"],
-            "label": label,
-            "query": query,
-            "results": result,
-        })
-    cache_path = Path(__file__).resolve().parent / "cached_l1_search_results.json"
-    cache_path.write_text(
-        json.dumps(raw_data, indent=2, ensure_ascii=False),
-        encoding="utf-8",
-    )
-    logger.info("Saved Layer 1 search results to %s", cache_path)
+    # # Save raw results for inspection
+    # raw_data = []
+    # for (idx, label, query), result in zip(work, results):
+    #     raw_data.append({
+    #         "hospital": hospitals[idx]["name"],
+    #         "label": label,
+    #         "query": query,
+    #         "results": result,
+    #     })
+    # cache_path = Path(__file__).resolve().parent / "cached_l1_search_results.json"
+    # cache_path.write_text(
+    #     json.dumps(raw_data, indent=2, ensure_ascii=False),
+    #     encoding="utf-8",
+    # )
+    # logger.info("Saved Layer 1 search results to %s", cache_path)
 
     # Group results by hospital
     hospital_sections: dict[int, list[str]] = {}
@@ -169,13 +169,13 @@ async def firecrawl_search_l2(
     """
     results = await _firecrawl_search(client, query)
 
-    # Save for inspection
-    cache_path = Path(__file__).resolve().parent / "cached_l2_search_results.json"
-    cache_path.write_text(
-        json.dumps({"query": query, "results": results}, indent=2, ensure_ascii=False),
-        encoding="utf-8",
-    )
-    logger.info("Saved Layer 2 search results to %s", cache_path)
+    # # Save for inspection
+    # cache_path = Path(__file__).resolve().parent / "cached_l2_search_results.json"
+    # cache_path.write_text(
+    #     json.dumps({"query": query, "results": results}, indent=2, ensure_ascii=False),
+    #     encoding="utf-8",
+    # )
+    # logger.info("Saved Layer 2 search results to %s", cache_path)
 
     formatted = _format_results(results)
     return formatted if formatted else "No additional search results found."

@@ -18,32 +18,27 @@ YOU ALREADY KNOW THE NEARBY HOSPITALS (basic info from Google Places):
 {{hospitals_data}}
 
 CONVERSATION FLOW — TRIAGE PHASE:
-You MUST ask these 4 questions one at a time. After the user answers each question, IMMEDIATELY call the update_triage_card tool to update the corresponding card in the UI before asking the next question.
+You MUST ask these 3 questions one at a time. After the user answers each question, IMMEDIATELY call the update_triage_card tool to update the corresponding card in the UI before asking the next question.
 
 Question 1 (card_number=1, label="Symptoms"):
   Ask: "What symptoms or injury are you experiencing?"
   → Update card with a brief summary of their symptoms.
   → If the user describes a life-threatening emergency, tell them to call 911 immediately and end.
 
-Question 2 (card_number=2, label="Severity"):
-  Ask: "On a scale of 1 to 10, how severe would you say it is?"
-  → Update card with their severity level (e.g. "7/10 - Moderate to severe").
+Question 2 (card_number=2, label="Severity & Duration"):
+  Ask: "How severe is it on a scale of 1 to 10, and how long has it been going on?"
+  → Update card with both severity and duration (e.g. "6/10 — since last night (~12 hours)").
 
-Question 3 (card_number=3, label="Duration"):
-  Ask: "How long have you been experiencing this?"
-  → Update card with duration (e.g. "Since yesterday", "2 hours").
-
-Question 4 (card_number=4, label="Insurance"):
+Question 3 (card_number=3, label="Insurance"):
   Ask: "Do you have an insurance provider? This is optional but helps narrow choices."
   → Update card with their answer (e.g. "Blue Cross" or "No insurance / Skipped").
 
 IMPORTANT: Call update_triage_card EVERY time you get an answer. Do not batch them. Call it immediately after each answer before moving to the next question.
 
 LAYER 1 SEARCH PHASE:
-After the user answers Question 4 (Insurance):
-1. IMMEDIATELY call update_triage_card for card 5 with their answer.
-2. THEN say: "Thank you for all that information. Let me search for detailed information about the nearby hospitals to find the best match for your situation. Just a moment."
-3. IMMEDIATELY call fetch_hospital_search_l1 with the user's triage answers (symptoms from Q2, severity from Q3, duration from Q4, insurance from Q5).
+After the user answers Question 3 (Insurance):
+1. Say: "Thank you for all that information. Let me search for detailed information about the nearby hospitals to find the best match for your situation. Just a moment."
+2. IMMEDIATELY call fetch_hospital_search_l1 with the user's triage answers (symptoms from Q1, severity and duration from Q2, insurance from Q3).
 4. Wait for the tool response — it will contain web search results about each hospital's specialties, insurance compatibility, and patient reviews relevant to the user's situation.
 
 FOLLOW-UP PHASE:
@@ -115,14 +110,14 @@ def create_agent():
                             "description": (
                                 "Update a triage question card in the UI with the user's answer. "
                                 "Call this IMMEDIATELY after the user answers each triage question. "
-                                "card_number is 1-5 corresponding to the 5 triage questions."
+                                "card_number is 1-3 corresponding to the 3 triage questions."
                             ),
                             "parameters": {
                                 "type": "object",
                                 "properties": {
                                     "card_number": {
                                         "type": "number",
-                                        "description": "Which triage card to update (1-4): 1=Symptoms, 2=Severity, 3=Duration, 4=Insurance",
+                                        "description": "Which triage card to update (1-3): 1=Symptoms, 2=Severity & Duration, 3=Insurance",
                                     },
                                     "answer": {
                                         "type": "string",
@@ -160,7 +155,7 @@ def create_agent():
                             "name": "fetch_hospital_search_l1",
                             "description": (
                                 "Search the web for detailed information about nearby hospitals "
-                                "based on the user's triage answers. Call this AFTER all 5 triage "
+                                "based on the user's triage answers. Call this AFTER all 3 triage "
                                 "questions are answered. Returns search results about each hospital's "
                                 "specialties, insurance, and reviews relevant to the user's situation."
                             ),
@@ -169,19 +164,19 @@ def create_agent():
                                 "properties": {
                                     "symptoms": {
                                         "type": "string",
-                                        "description": "The user's reported symptoms from triage question 2",
+                                        "description": "The user's reported symptoms from triage question 1",
                                     },
                                     "severity": {
                                         "type": "string",
-                                        "description": "The severity level from triage question 3",
+                                        "description": "The severity level from triage question 2",
                                     },
                                     "duration": {
                                         "type": "string",
-                                        "description": "How long symptoms have lasted from triage question 4",
+                                        "description": "How long symptoms have lasted from triage question 2",
                                     },
                                     "insurance": {
                                         "type": "string",
-                                        "description": "The user's insurance provider from triage question 5, or 'none'",
+                                        "description": "The user's insurance provider from triage question 3, or 'none'",
                                     },
                                 },
                                 "required": ["symptoms", "severity", "duration", "insurance"],

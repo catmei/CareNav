@@ -748,7 +748,7 @@ a:hover { opacity: 0.8; }
 #map { border-radius: 0; }
 
 /* === Hospitals Section === */
-.hospitals-section { padding: 16px 20px 0; }
+.hospitals-section { padding: 16px 20px 20px; }
 .section-header {
   display: flex;
   justify-content: space-between;
@@ -908,6 +908,7 @@ a:hover { opacity: 0.8; }
 }
 
 .hospital-detail-card .detail-section { margin-top: 14px; }
+.hospital-detail-card .detail-section:last-child { margin-bottom: 0; }
 
 .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
 .card-name {

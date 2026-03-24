@@ -1,8 +1,6 @@
 """FastAPI backend for CareNav."""
 
 import os
-import json
-import asyncio
 import httpx
 from pathlib import Path
 from dotenv import load_dotenv
@@ -27,6 +25,7 @@ app.add_middleware(
 )
 
 
+
 @app.get("/api/hospitals/enriched")
 async def get_enriched_hospitals(
     lat: float = Query(..., description="User latitude"),
@@ -36,11 +35,11 @@ async def get_enriched_hospitals(
 
     Firecrawl searches are deferred to Layer 1/Layer 2 after triage.
     """
-    cache_path = Path(__file__).resolve().parent / "cached_hospitals.json"
+    # cache_path = Path(__file__).resolve().parent / "cached_hospitals.json"
 
-    # If cache exists, skip API calls entirely
-    if cache_path.exists():
-        return json.loads(cache_path.read_text(encoding="utf-8"))
+    # # If cache exists, skip API calls entirely
+    # if cache_path.exists():
+    #     return json.loads(cache_path.read_text(encoding="utf-8"))
 
     async with httpx.AsyncClient() as client:
         places = await fetch_google_hospitals(client, lat, lng)
@@ -48,27 +47,20 @@ async def get_enriched_hospitals(
         hospitals.sort(key=lambda x: x["distance_miles"])
         top5 = hospitals[:5]
 
-    result = {"hospitals": top5}
-
-    # Save for future runs
-    cache_path.write_text(json.dumps(result, indent=2, ensure_ascii=False), encoding="utf-8")
-
-    return result
+    return {"hospitals": top5}
 
 
 class L1SearchRequest(BaseModel):
     triage_data: dict
+    hospitals: list[dict]
 
 
 @app.post("/api/hospitals/search-l1")
 async def search_hospitals_l1(request: L1SearchRequest):
-    """Layer 1: triage-informed Firecrawl search for each cached hospital."""
-    cache_path = Path(__file__).resolve().parent / "cached_hospitals.json"
-    if not cache_path.exists():
-        raise HTTPException(status_code=400, detail="No cached hospitals. Call /api/hospitals/enriched first.")
-
-    cached = json.loads(cache_path.read_text(encoding="utf-8"))
-    hospitals = cached.get("hospitals", [])
+    """Layer 1: triage-informed Firecrawl search for each hospital."""
+    hospitals = request.hospitals
+    if not hospitals:
+        raise HTTPException(status_code=400, detail="No hospitals provided. Call /api/hospitals/enriched first.")
 
     async with httpx.AsyncClient() as client:
         search_results = await firecrawl_search_l1(client, hospitals, request.triage_data)
