@@ -405,16 +405,36 @@ async function startSession() {
     return;
   }
 
-  voiceStatus.textContent = "Connecting...";
+  voiceStatus.textContent = "Requesting microphone access...";
 
   try {
-    // Get signed URL from backend
-    const res = await fetch("/api/signed-url");
+    // Request mic permission and signed URL in parallel to avoid delay
+    const [micResult, urlResult] = await Promise.allSettled([
+      navigator.mediaDevices.getUserMedia({ audio: true }),
+      fetch("/api/signed-url"),
+    ]);
+
+    // Check mic permission
+    if (micResult.status === "rejected") {
+      voiceStatus.textContent = "Microphone access denied. Click to retry.";
+      showCaption("Please allow microphone access to start a voice session.");
+      return;
+    }
+    // Stop the stream — ElevenLabs SDK will open its own
+    micResult.value.getTracks().forEach((t) => t.stop());
+
+    // Check signed URL
+    if (urlResult.status === "rejected") {
+      throw new Error("Failed to fetch signed URL");
+    }
+    const res = urlResult.value;
     if (!res.ok) {
       const err = await res.json();
       throw new Error(err.detail || "Failed to get signed URL");
     }
     const { signedUrl } = await res.json();
+
+    voiceStatus.textContent = "Connecting...";
 
     // Prepare hospital data for the agent prompt
     const hospitalsForAgent = state.hospitals.map((h) => ({
