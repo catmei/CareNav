@@ -1,4 +1,4 @@
-# CareNav
+# <img src="frontend/logo.png" alt="CareNav Logo" width="32"> CareNav
 
 Voice-powered AI hospital navigator that helps you find the right hospital for your medical situation through natural conversation, real-time web search, and geolocation.
 
